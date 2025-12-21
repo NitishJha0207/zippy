@@ -1,9 +1,11 @@
-import { FileText, LogOut } from 'lucide-react';
+import { FileText, LogOut, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProfile } from '../../hooks/useProfile';
 import { Button } from '../ui/Button';
 
 export function Header() {
+  const navigate = useNavigate();
   const { signOut } = useAuth();
   const { profile } = useProfile();
 
@@ -20,10 +22,20 @@ export function Header() {
               )}
             </div>
           </div>
-          <Button variant="outline" onClick={signOut} className="flex items-center gap-2">
-            <LogOut className="w-4 h-4" />
-            Sign Out
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              onClick={() => navigate('/profile')}
+              className="flex items-center gap-2"
+            >
+              <User className="w-4 h-4" />
+              My Profile
+            </Button>
+            <Button variant="outline" onClick={signOut} className="flex items-center gap-2">
+              <LogOut className="w-4 h-4" />
+              Sign Out
+            </Button>
+          </div>
         </div>
       </div>
     </header>
