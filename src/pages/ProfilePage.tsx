@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useProfile } from '../hooks/useProfile';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { LogoUpload } from '../components/onboarding/LogoUpload';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { validateGSTIN, validateMobile } from '../lib/utils';
-import { User } from 'lucide-react';
+import { User, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export function ProfilePage() {
+  const navigate = useNavigate();
   const { profile, loading: profileLoading, updateProfile } = useProfile();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -106,6 +108,13 @@ export function ProfilePage() {
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Back</span>
+          </button>
           <div className="flex items-center gap-3 mb-2">
             <div className="bg-blue-600 p-2 rounded-lg">
               <User className="w-6 h-6 text-white" />
