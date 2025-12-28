@@ -58,7 +58,9 @@ export function PublicInvoicePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadInvoice();
+    if (token) {
+      loadInvoice();
+    }
   }, [token]);
 
   const loadInvoice = async () => {
@@ -67,17 +69,31 @@ export function PublicInvoicePage() {
         .from('invoices')
         .select('*')
         .eq('share_token', token)
-        .single();
+        .maybeSingle();
 
-      if (invoiceError) throw new Error('Invoice not found');
+      if (invoiceError) {
+        console.error('Invoice error:', invoiceError);
+        throw new Error('Invoice not found');
+      }
+
+      if (!invoiceData) {
+        throw new Error('Invoice not found');
+      }
 
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('company_name, company_address, company_logo_url, gstin, mobile_number, email, upi_id')
         .eq('id', invoiceData.user_id)
-        .single();
+        .maybeSingle();
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Profile error:', profileError);
+        throw profileError;
+      }
+
+      if (!profileData) {
+        throw new Error('Profile not found');
+      }
 
       const { data: itemsData, error: itemsError } = await supabase
         .from('invoice_items')
@@ -85,12 +101,20 @@ export function PublicInvoicePage() {
         .eq('invoice_id', invoiceData.id)
         .order('item_order');
 
-      if (itemsError) throw itemsError;
+      if (itemsError) {
+        console.error('Items error:', itemsError);
+        throw itemsError;
+      }
+
+      console.log('Loaded invoice:', invoiceData);
+      console.log('Loaded profile:', profileData);
+      console.log('Loaded items:', itemsData);
 
       setInvoice(invoiceData);
       setProfile(profileData);
-      setItems(itemsData);
+      setItems(itemsData || []);
     } catch (err: any) {
+      console.error('Load invoice error:', err);
       setError(err.message || 'Failed to load invoice');
     } finally {
       setLoading(false);

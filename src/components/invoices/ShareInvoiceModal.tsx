@@ -42,11 +42,6 @@ export function ShareInvoiceModal({
     }
   }, [isOpen, invoiceId]);
 
-  useEffect(() => {
-    if (pdfUrl && message.includes('(generating...)')) {
-      setMessage(prev => prev.replace('(generating...)', pdfUrl));
-    }
-  }, [pdfUrl]);
 
   const loadCustomerDetails = async () => {
     try {
@@ -98,16 +93,16 @@ export function ShareInvoiceModal({
       }
 
       const invoiceUrl = `${window.location.origin}/invoice/${invoice.share_token}`;
-      const pdfDownloadMsg = '\n\nDownload PDF: (generating...)';
+      const pdfDownloadText = pdfPublicUrl ? `\n\nDownload PDF: ${pdfPublicUrl}` : '';
 
       if (invoice.payment_link) {
         setPaymentLink(invoice.payment_link);
         setMessage(
-          `Hi ${customerName},\n\nYour invoice ${invoiceNumber} for ₹${amount.toFixed(2)} is ready.\n\nView Invoice: ${invoiceUrl}${pdfDownloadMsg}\n\nPay now: ${invoice.payment_link}\n\nThank you for your business!`
+          `Hi ${customerName},\n\nYour invoice ${invoiceNumber} for ₹${amount.toFixed(2)} is ready.\n\nView Invoice: ${invoiceUrl}${pdfDownloadText}\n\nPay now: ${invoice.payment_link}\n\nThank you for your business!`
         );
       } else {
         setMessage(
-          `Hi ${customerName},\n\nYour invoice ${invoiceNumber} for ₹${amount.toFixed(2)} is ready.\n\nView Invoice: ${invoiceUrl}${pdfDownloadMsg}\n\nThank you for your business!`
+          `Hi ${customerName},\n\nYour invoice ${invoiceNumber} for ₹${amount.toFixed(2)} is ready.\n\nView Invoice: ${invoiceUrl}${pdfDownloadText}\n\nThank you for your business!`
         );
       }
     } catch (error) {
@@ -176,13 +171,19 @@ export function ShareInvoiceModal({
 
       const cleanPhone = phoneNumber.replace(/\D/g, '');
       const encodedMessage = encodeURIComponent(message);
-      const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
 
-      window.open(whatsappUrl, '_blank');
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const whatsappUrl = isMobile
+        ? `whatsapp://send?phone=${cleanPhone}&text=${encodedMessage}`
+        : `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
 
-      toast.success('Opening WhatsApp...');
-      onStatusUpdate();
-      onClose();
+      window.location.href = whatsappUrl;
+
+      setTimeout(() => {
+        toast.success('Opening WhatsApp...');
+        onStatusUpdate();
+        onClose();
+      }, 500);
     } catch (error) {
       console.error('Error sharing via WhatsApp:', error);
       toast.error('Failed to share via WhatsApp');
