@@ -5,14 +5,18 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { LogoUpload } from '../components/onboarding/LogoUpload';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { ReminderSettings } from '../components/settings/ReminderSettings';
+import { RazorpaySettings } from '../components/settings/RazorpaySettings';
+import { EInvoiceInfo } from '../components/settings/EInvoiceInfo';
 import { validateGSTIN, validateMobile } from '../lib/utils';
-import { User, ArrowLeft } from 'lucide-react';
+import { User, ArrowLeft, Bell, CreditCard, Crown, FileCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export function ProfilePage() {
   const navigate = useNavigate();
   const { profile, loading: profileLoading, updateProfile } = useProfile();
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'profile' | 'reminders' | 'payment' | 'subscription' | 'einvoice'>('profile');
   const [formData, setFormData] = useState({
     user_name: '',
     mobile_number: '',
@@ -107,6 +111,14 @@ export function ProfilePage() {
     );
   }
 
+  const tabs = [
+    { id: 'profile' as const, label: 'Profile', icon: User },
+    { id: 'reminders' as const, label: 'Reminders', icon: Bell },
+    { id: 'payment' as const, label: 'Payment Gateway', icon: CreditCard },
+    { id: 'subscription' as const, label: 'Subscription', icon: Crown },
+    { id: 'einvoice' as const, label: 'e-Invoice Compliance', icon: FileCheck }
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
@@ -122,12 +134,35 @@ export function ProfilePage() {
             <div className="bg-blue-600 p-2 rounded-lg">
               <User className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-3xl font-bold">My Profile</h1>
+            <h1 className="text-3xl font-bold">Settings</h1>
           </div>
           <p className="text-gray-600">Manage your business information and settings</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white rounded-lg shadow-md mb-6">
+          <div className="flex border-b overflow-x-auto">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? 'border-b-2 border-blue-600 text-blue-600'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {activeTab === 'profile' && (
+          <form onSubmit={handleSubmit} className="space-y-6">
           <div className="bg-white p-6 rounded-lg shadow">
             <h3 className="text-lg font-semibold mb-4">Personal Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -243,6 +278,107 @@ export function ProfilePage() {
             {loading ? 'Updating...' : 'Update Profile'}
           </Button>
         </form>
+        )}
+
+        {activeTab === 'reminders' && <ReminderSettings />}
+
+        {activeTab === 'payment' && <RazorpaySettings />}
+
+        {activeTab === 'einvoice' && <EInvoiceInfo />}
+
+        {activeTab === 'subscription' && (
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <Crown className="w-6 h-6 text-yellow-600" />
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Subscription Plan</h2>
+                <p className="text-sm text-gray-600">Manage your subscription and billing</p>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-6 mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-sm text-gray-600">Current Plan</p>
+                  <p className="text-2xl font-bold text-gray-900 capitalize">{profile?.subscription_tier || 'Free'}</p>
+                </div>
+                <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  profile?.subscription_status === 'active'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {profile?.subscription_status === 'active' ? 'Active' : profile?.subscription_status || 'Active'}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-gray-600">Invoices This Month</p>
+                  <p className="text-lg font-semibold text-gray-900">{profile?.monthly_invoice_count || 0}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Monthly Limit</p>
+                  <p className="text-lg font-semibold text-gray-900">
+                    {profile?.subscription_tier === 'free' ? '10' : 'Unlimited'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="border rounded-lg p-4">
+                <h3 className="font-semibold text-lg mb-2">Free</h3>
+                <p className="text-3xl font-bold mb-4">₹0<span className="text-sm text-gray-600">/month</span></p>
+                <ul className="space-y-2 text-sm text-gray-600 mb-4">
+                  <li>✓ Up to 10 invoices/month</li>
+                  <li>✓ Basic invoice templates</li>
+                  <li>✓ WhatsApp & Email sharing</li>
+                  <li>✓ UPI payments</li>
+                </ul>
+                {profile?.subscription_tier === 'free' && (
+                  <div className="bg-gray-100 text-gray-700 px-4 py-2 rounded text-center text-sm font-medium">
+                    Current Plan
+                  </div>
+                )}
+              </div>
+
+              <div className="border-2 border-blue-600 rounded-lg p-4 relative">
+                <div className="absolute top-0 right-0 bg-blue-600 text-white px-3 py-1 text-xs rounded-bl-lg rounded-tr-lg">
+                  Popular
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Pro</h3>
+                <p className="text-3xl font-bold mb-4">₹499<span className="text-sm text-gray-600">/month</span></p>
+                <ul className="space-y-2 text-sm text-gray-600 mb-4">
+                  <li>✓ Unlimited invoices</li>
+                  <li>✓ All templates</li>
+                  <li>✓ Automatic reminders</li>
+                  <li>✓ Recurring invoices</li>
+                  <li>✓ Analytics dashboard</li>
+                  <li>✓ Priority support</li>
+                </ul>
+                <Button className="w-full" variant="primary">
+                  Upgrade to Pro
+                </Button>
+              </div>
+
+              <div className="border rounded-lg p-4">
+                <h3 className="font-semibold text-lg mb-2">Business</h3>
+                <p className="text-3xl font-bold mb-4">₹999<span className="text-sm text-gray-600">/month</span></p>
+                <ul className="space-y-2 text-sm text-gray-600 mb-4">
+                  <li>✓ Everything in Pro</li>
+                  <li>✓ Multi-user access</li>
+                  <li>✓ API access</li>
+                  <li>✓ E-invoice compliance</li>
+                  <li>✓ Custom branding</li>
+                  <li>✓ Dedicated support</li>
+                </ul>
+                <Button className="w-full" variant="outline">
+                  Upgrade to Business
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
