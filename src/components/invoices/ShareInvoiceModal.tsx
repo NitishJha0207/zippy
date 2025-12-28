@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
-import { MessageSquare, Mail, Link as LinkIcon } from 'lucide-react';
+import { MessageSquare, Mail, Link as LinkIcon, FileDown } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { getRazorpayConfig, createPaymentLink } from '../../lib/razorpay';
+import { generateAndUploadInvoicePDF, getInvoiceHTML } from '../../lib/pdfService';
 import toast from 'react-hot-toast';
 
 interface ShareInvoiceModalProps {
@@ -33,6 +34,7 @@ export function ShareInvoiceModal({
   const [loading, setLoading] = useState(false);
   const [paymentLink, setPaymentLink] = useState('');
   const [generatingPaymentLink, setGeneratingPaymentLink] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -40,15 +42,23 @@ export function ShareInvoiceModal({
     }
   }, [isOpen, invoiceId]);
 
+  useEffect(() => {
+    if (pdfUrl && message.includes('(generating...)')) {
+      setMessage(prev => prev.replace('(generating...)', pdfUrl));
+    }
+  }, [pdfUrl]);
+
   const loadCustomerDetails = async () => {
     try {
       const { data: invoice } = await supabase
         .from('invoices')
-        .select('customer_id, payment_link, share_token')
+        .select('*, user_id')
         .eq('id', invoiceId)
         .single();
 
-      if (invoice?.customer_id) {
+      if (!invoice) return;
+
+      if (invoice.customer_id) {
         const { data: customer } = await supabase
           .from('customers')
           .select('phone, email')
@@ -61,16 +71,43 @@ export function ShareInvoiceModal({
         }
       }
 
-      const invoiceUrl = `${window.location.origin}/invoice/${invoice?.share_token}`;
+      const { data: items } = await supabase
+        .from('invoice_items')
+        .select('*')
+        .eq('invoice_id', invoiceId)
+        .order('item_order');
 
-      if (invoice?.payment_link) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('company_name, company_address, gstin, company_logo_url, upi_id')
+        .eq('id', invoice.user_id)
+        .single();
+
+      if (items && profile) {
+        const htmlContent = getInvoiceHTML(invoice, items, profile);
+        const pdfPublicUrl = await generateAndUploadInvoicePDF({
+          invoiceId,
+          userId: invoice.user_id,
+          invoiceNumber,
+          htmlContent
+        });
+
+        if (pdfPublicUrl) {
+          setPdfUrl(pdfPublicUrl);
+        }
+      }
+
+      const invoiceUrl = `${window.location.origin}/invoice/${invoice.share_token}`;
+      const pdfDownloadMsg = '\n\nDownload PDF: (generating...)';
+
+      if (invoice.payment_link) {
         setPaymentLink(invoice.payment_link);
         setMessage(
-          `Hi ${customerName},\n\nYour invoice ${invoiceNumber} for ₹${amount.toFixed(2)} is ready.\n\nView Invoice: ${invoiceUrl}\n\nPay now: ${invoice.payment_link}\n\nThank you for your business!`
+          `Hi ${customerName},\n\nYour invoice ${invoiceNumber} for ₹${amount.toFixed(2)} is ready.\n\nView Invoice: ${invoiceUrl}${pdfDownloadMsg}\n\nPay now: ${invoice.payment_link}\n\nThank you for your business!`
         );
       } else {
         setMessage(
-          `Hi ${customerName},\n\nYour invoice ${invoiceNumber} for ₹${amount.toFixed(2)} is ready.\n\nView Invoice: ${invoiceUrl}\n\nThank you for your business!`
+          `Hi ${customerName},\n\nYour invoice ${invoiceNumber} for ₹${amount.toFixed(2)} is ready.\n\nView Invoice: ${invoiceUrl}${pdfDownloadMsg}\n\nThank you for your business!`
         );
       }
     } catch (error) {
@@ -250,6 +287,28 @@ export function ShareInvoiceModal({
             </a>
           </div>
         )}
+
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-1">PDF Invoice</p>
+              <p className="text-xs text-gray-500">
+                {pdfUrl ? 'Ready to share' : 'Generating PDF...'}
+              </p>
+            </div>
+            {pdfUrl && (
+              <a
+                href={pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+              >
+                <FileDown className="w-4 h-4" />
+                Download
+              </a>
+            )}
+          </div>
+        </div>
 
         <div className="flex gap-2">
           <button
