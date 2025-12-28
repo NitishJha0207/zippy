@@ -16,7 +16,7 @@ export function Header() {
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 flex-shrink-0" />
             <div className="min-w-0">
-              <h1 className="text-base sm:text-xl font-bold text-gray-900 truncate">Invoice Generator</h1>
+              <h1 className="text-base sm:text-xl font-bold text-gray-900 truncate">Zippy Bill</h1>
               {profile && (
                 <p className="text-xs text-gray-500 truncate hidden sm:block">{profile.company_name}</p>
               )}

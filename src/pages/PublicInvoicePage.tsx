@@ -201,8 +201,8 @@ export function PublicInvoicePage() {
         )}
 
         <div className="bg-white shadow-lg rounded-lg overflow-hidden border-2 border-black">
-          <div className="p-6 border-b-2 border-black">
-            <div className="flex items-center justify-between">
+          <div className="p-4 sm:p-6 border-b-2 border-black">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               {profile.company_logo_url && (
                 <img
                   src={profile.company_logo_url}
@@ -210,20 +210,20 @@ export function PublicInvoicePage() {
                   className="h-16 object-contain"
                 />
               )}
-              <div className={`${profile.company_logo_url ? 'text-right' : 'text-center flex-1'}`}>
-                <h1 className="text-2xl font-bold">{profile.company_name}</h1>
-                <p className="text-sm text-gray-600 mt-1">{profile.company_address}</p>
-                {profile.gstin && <p className="text-sm text-gray-600">GSTIN: {profile.gstin}</p>}
+              <div className={`${profile.company_logo_url ? 'text-center sm:text-right' : 'text-center flex-1'}`}>
+                <h1 className="text-xl sm:text-2xl font-bold">{profile.company_name}</h1>
+                <p className="text-xs sm:text-sm text-gray-600 mt-1">{profile.company_address}</p>
+                {profile.gstin && <p className="text-xs sm:text-sm text-gray-600">GSTIN: {profile.gstin}</p>}
               </div>
             </div>
           </div>
 
           <div className="bg-gray-100 p-3 border-b-2 border-black text-center">
-            <h2 className="text-xl font-bold">TAX INVOICE</h2>
+            <h2 className="text-lg sm:text-xl font-bold">TAX INVOICE</h2>
           </div>
 
-          <div className="grid grid-cols-2 border-b-2 border-black">
-            <div className="p-4 border-r-2 border-black">
+          <div className="grid grid-cols-1 sm:grid-cols-2 border-b-2 border-black">
+            <div className="p-4 sm:border-r-2 border-black border-b sm:border-b-0">
               <p className="text-sm"><strong>Invoice #:</strong> {invoice.invoice_number}</p>
               <p className="text-sm"><strong>Date:</strong> {format(new Date(invoice.invoice_date), 'dd/MM/yyyy')}</p>
               <p className="text-sm"><strong>Status:</strong> <span className="uppercase">{invoice.status}</span></p>
@@ -236,37 +236,39 @@ export function PublicInvoicePage() {
             </div>
           </div>
 
-          <table className="w-full">
-            <thead className="bg-gray-100 border-b-2 border-black">
-              <tr>
-                <th className="p-3 text-left border-r border-black">Item</th>
-                <th className="p-3 text-right border-r border-black">Rate</th>
-                <th className="p-3 text-right border-r border-black">Qty</th>
-                <th className="p-3 text-right border-r border-black">Amount</th>
-                <th className="p-3 text-right">Tax</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item, index) => (
-                <tr key={index} className="border-b border-black">
-                  <td className="p-3 border-r border-black">
-                    <p className="font-medium">{item.product_description}</p>
-                    {item.hsn_code && <p className="text-xs text-gray-500">HSN: {item.hsn_code}</p>}
-                  </td>
-                  <td className="p-3 text-right border-r border-black">₹{item.rate.toFixed(2)}</td>
-                  <td className="p-3 text-right border-r border-black">{item.quantity}</td>
-                  <td className="p-3 text-right border-r border-black">₹{item.amount.toFixed(2)}</td>
-                  <td className="p-3 text-right">
-                    <p className="text-xs text-gray-600">GST {item.gst_rate}%</p>
-                    <p>₹{(item.cgst + item.sgst).toFixed(2)}</p>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[600px]">
+              <thead className="bg-gray-100 border-b-2 border-black">
+                <tr>
+                  <th className="p-3 text-left border-r border-black">Item</th>
+                  <th className="p-3 text-right border-r border-black">Rate</th>
+                  <th className="p-3 text-right border-r border-black">Qty</th>
+                  <th className="p-3 text-right border-r border-black">Amount</th>
+                  <th className="p-3 text-right">Tax</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {items.map((item, index) => (
+                  <tr key={index} className="border-b border-black">
+                    <td className="p-3 border-r border-black">
+                      <p className="font-medium">{item.product_description}</p>
+                      {item.hsn_code && <p className="text-xs text-gray-500">HSN: {item.hsn_code}</p>}
+                    </td>
+                    <td className="p-3 text-right border-r border-black">₹{item.rate.toFixed(2)}</td>
+                    <td className="p-3 text-right border-r border-black">{item.quantity}</td>
+                    <td className="p-3 text-right border-r border-black">₹{item.amount.toFixed(2)}</td>
+                    <td className="p-3 text-right">
+                      <p className="text-xs text-gray-600">GST {item.gst_rate}%</p>
+                      <p>₹{(item.cgst + item.sgst).toFixed(2)}</p>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-          <div className="grid grid-cols-2 border-t-2 border-black">
-            <div className="p-4 border-r-2 border-black">
+          <div className="grid grid-cols-1 sm:grid-cols-2 border-t-2 border-black">
+            <div className="p-4 sm:border-r-2 border-black border-b sm:border-b-0">
               {invoice.bank_name && (
                 <>
                   <h3 className="font-bold mb-2">Payment Details</h3>

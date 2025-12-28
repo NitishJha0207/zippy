@@ -14,7 +14,7 @@ export function AuthPage() {
             <FileText className="w-8 h-8 text-white" />
           </div>
         </div>
-        <h1 className="text-2xl font-bold text-center mb-2">Invoice Generator</h1>
+        <h1 className="text-2xl font-bold text-center mb-2">Zippy Bill</h1>
         <p className="text-gray-600 text-center mb-6">
           {isLogin ? 'Sign in to your account' : 'Create your account'}
         </p>
