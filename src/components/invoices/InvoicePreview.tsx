@@ -263,35 +263,35 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
     <>
       <Modal isOpen={isOpen} onClose={onClose} title="GST Invoice Preview" size="large">
         <div className="invoice-preview-container">
-          <div className="mb-6 flex justify-between items-center print:hidden">
-            <div className="flex gap-2">
+          <div className="mb-6 print:hidden">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               {invoice.status !== 'paid' && (
-                <Button onClick={handleMarkAsPaid} variant="outline">
+                <Button onClick={handleMarkAsPaid} variant="outline" className="w-full sm:w-auto">
                   <CheckCircle className="w-4 h-4 mr-2" />
                   Mark as Paid
                 </Button>
               )}
-            </div>
-            <div className="flex gap-3">
               <Button
                 onClick={() => setIsShareModalOpen(true)}
                 variant="outline"
+                className="w-full sm:w-auto"
               >
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Share
               </Button>
-              <Button onClick={handlePrint} variant="outline">
+              <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
                 <Printer className="w-4 h-4 mr-2" />
                 Print
               </Button>
-              <Button onClick={handleDownload} loading={downloading}>
+              <Button onClick={handleDownload} loading={downloading} className="w-full sm:w-auto">
                 <Download className="w-4 h-4 mr-2" />
                 Download PDF
               </Button>
             </div>
           </div>
 
-        <div ref={invoiceRef} className="invoice-content bg-white border-2 border-black text-xs">
+        <div className="overflow-x-auto">
+          <div ref={invoiceRef} className="invoice-content bg-white border-2 border-black text-xs min-w-[800px]">
           <div className="border-b-2 border-black p-2">
             <div className="flex items-center justify-between">
               {profile.company_logo_url && (
@@ -473,6 +473,7 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
             </div>
           </div>
         </div>
+        </div>
       </div>
 
       <style>{`
@@ -538,8 +539,14 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
 
         @media screen {
           .invoice-content {
-            max-height: 80vh;
+            max-height: 70vh;
             overflow-y: auto;
+          }
+
+          @media (max-width: 640px) {
+            .invoice-content {
+              font-size: 10px;
+            }
           }
         }
       `}</style>
