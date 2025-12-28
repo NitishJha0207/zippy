@@ -92,10 +92,11 @@ export function ShareInvoiceModal({
       }
 
       const invoiceUrl = `${window.location.origin}/invoice/${invoice.share_token}`;
-      const pdfDownloadText = generatedPdfUrl ? `\n\nDownload PDF: ${generatedPdfUrl}` : '';
+      const pdfDownloadText = generatedPdfUrl ? `\nDownload PDF: ${generatedPdfUrl}` : '';
+      const upiPaymentText = profile?.upi_id ? `\n\nPay via UPI: ${profile.upi_id}` : '';
 
       setMessage(
-        `Hi ${customerName},\n\nYour invoice ${invoiceNumber} for ₹${amount.toFixed(2)} is ready.\n\nView Invoice: ${invoiceUrl}${pdfDownloadText}\n\nThank you for your business!`
+        `Hi ${customerName},\n\nYour invoice ${invoiceNumber} for ₹${amount.toFixed(2)} is ready.\n\nView Invoice: ${invoiceUrl}${pdfDownloadText}${upiPaymentText}\n\nThank you for your business!`
       );
     } catch (error) {
       console.error('Error loading customer details:', error);
@@ -152,12 +153,6 @@ export function ShareInvoiceModal({
             <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
               <h2 style="color: #2563eb;">Invoice ${invoiceNumber}</h2>
               <div style="white-space: pre-wrap;">${message}</div>
-              ${paymentLink ? `
-                <div style="margin-top: 20px; padding: 15px; background-color: #f0f9ff; border-radius: 8px;">
-                  <p style="margin: 0 0 10px 0;">You can pay online using the link below:</p>
-                  <a href="${paymentLink}" style="display: inline-block; padding: 10px 20px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 5px;">Pay Now</a>
-                </div>
-              ` : ''}
               <p style="margin-top: 20px; color: #666; font-size: 14px;">Thank you for your business!</p>
             </div>
           </body>
