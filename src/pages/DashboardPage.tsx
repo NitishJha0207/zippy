@@ -17,11 +17,12 @@ type TabType = 'invoices' | 'customers';
 export function DashboardPage() {
   const navigate = useNavigate();
   const { profile, loading: profileLoading } = useProfile();
-  const { customers, loading: customersLoading, createCustomer } = useCustomers();
+  const { customers, loading: customersLoading, createCustomer, updateCustomer, deleteCustomer } = useCustomers();
   const { invoices, loading: invoicesLoading, createInvoice } = useInvoices();
   const [activeTab, setActiveTab] = useState<TabType>('invoices');
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
   const [isInvoiceFormOpen, setIsInvoiceFormOpen] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<any>(null);
 
   useEffect(() => {
     if (!profileLoading && !profile) {
@@ -30,9 +31,17 @@ export function DashboardPage() {
   }, [profile, profileLoading, navigate]);
 
   const handleCreateCustomer = async (customerData: any) => {
-    const { error } = await createCustomer(customerData);
-    if (!error) {
-      setIsCustomerModalOpen(false);
+    if (editingCustomer) {
+      const { error } = await updateCustomer(editingCustomer.id, customerData);
+      if (!error) {
+        setIsCustomerModalOpen(false);
+        setEditingCustomer(null);
+      }
+    } else {
+      const { error } = await createCustomer(customerData);
+      if (!error) {
+        setIsCustomerModalOpen(false);
+      }
     }
   };
 
@@ -170,7 +179,18 @@ export function DashboardPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {customers.map((customer) => (
                       <div key={customer.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                        <h3 className="font-semibold text-gray-900 mb-2">{customer.name}</h3>
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="font-semibold text-gray-900">{customer.name}</h3>
+                          <button
+                            onClick={() => {
+                              setEditingCustomer(customer);
+                              setIsCustomerModalOpen(true);
+                            }}
+                            className="text-blue-600 hover:text-blue-800 text-sm"
+                          >
+                            Edit
+                          </button>
+                        </div>
                         <p className="text-sm text-gray-600">{customer.email}</p>
                         <p className="text-sm text-gray-600">{customer.phone}</p>
                         <p className="text-sm text-gray-600 mt-2">{customer.address}</p>
@@ -189,8 +209,12 @@ export function DashboardPage() {
 
       <CustomerModal
         isOpen={isCustomerModalOpen}
-        onClose={() => setIsCustomerModalOpen(false)}
+        onClose={() => {
+          setIsCustomerModalOpen(false);
+          setEditingCustomer(null);
+        }}
         onSave={handleCreateCustomer}
+        customer={editingCustomer}
       />
 
       <InvoiceForm

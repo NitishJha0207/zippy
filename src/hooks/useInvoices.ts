@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { InvoiceStatus } from '../types/database.types';
 import toast from 'react-hot-toast';
 
 interface InvoiceListItem {
@@ -9,6 +10,9 @@ interface InvoiceListItem {
   invoice_date: string;
   grand_total: number;
   customer_name: string;
+  status: InvoiceStatus;
+  due_date: string | null;
+  payment_link: string | null;
 }
 
 interface InvoiceData {
@@ -57,7 +61,10 @@ export function useInvoices() {
           invoice_number,
           invoice_date,
           grand_total,
-          bill_to_name
+          bill_to_name,
+          status,
+          due_date,
+          payment_link
         `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
@@ -69,7 +76,10 @@ export function useInvoices() {
         invoice_number: inv.invoice_number,
         invoice_date: inv.invoice_date,
         grand_total: inv.grand_total,
-        customer_name: inv.bill_to_name
+        customer_name: inv.bill_to_name,
+        status: inv.status as InvoiceStatus,
+        due_date: inv.due_date,
+        payment_link: inv.payment_link
       }));
 
       setInvoices(formattedInvoices);
@@ -260,11 +270,45 @@ export function useInvoices() {
     }
   };
 
+  const updateInvoiceStatus = async (id: string, status: InvoiceStatus, additionalData?: any) => {
+    try {
+      const updateData: any = { status };
+
+      if (status === 'sent' && !additionalData?.sent_date) {
+        updateData.sent_date = new Date().toISOString();
+      }
+
+      if (status === 'paid' && !additionalData?.payment_date) {
+        updateData.payment_date = new Date().toISOString();
+      }
+
+      if (additionalData) {
+        Object.assign(updateData, additionalData);
+      }
+
+      const { error } = await supabase
+        .from('invoices')
+        .update(updateData)
+        .eq('id', id);
+
+      if (error) throw error;
+
+      await fetchInvoices();
+      toast.success(`Invoice marked as ${status}`);
+      return { error: null };
+    } catch (error: any) {
+      console.error('Error updating invoice:', error);
+      toast.error('Failed to update invoice');
+      return { error: error.message };
+    }
+  };
+
   return {
     invoices,
     loading,
     getNextInvoiceNumber,
     createInvoice,
+    updateInvoiceStatus,
     deleteInvoice,
     refetch: fetchInvoices
   };

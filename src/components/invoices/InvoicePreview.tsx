@@ -1,12 +1,14 @@
 import { useEffect, useState, useRef } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
-import { Download, Printer } from 'lucide-react';
+import { Download, Printer, MessageSquare, CheckCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useProfile } from '../../hooks/useProfile';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import { printInvoice } from '../../lib/pdfGenerator';
+import { ShareInvoiceModal } from './ShareInvoiceModal';
+import { useInvoices } from '../../hooks/useInvoices';
 
 interface InvoicePreviewProps {
   invoiceId: string;
@@ -99,10 +101,12 @@ function numberToWords(num: number): string {
 
 export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewProps) {
   const { profile } = useProfile();
-  const [invoice, setInvoice] = useState<InvoiceDetail | null>(null);
+  const { updateInvoiceStatus, refetch } = useInvoices();
+  const [invoice, setInvoice] = useState<any>(null);
   const [items, setItems] = useState<InvoiceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const invoiceRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -137,6 +141,12 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleMarkAsPaid = async () => {
+    await updateInvoiceStatus(invoiceId, 'paid');
+    await loadInvoice();
+    await refetch();
   };
 
   const handleDownload = async () => {
@@ -213,18 +223,36 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
   const amountInWords = numberToWords(Math.floor(invoice.grand_total));
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="GST Invoice Preview" size="large">
-      <div className="invoice-preview-container">
-        <div className="mb-6 flex justify-end gap-3 print:hidden">
-          <Button onClick={handlePrint} variant="outline">
-            <Printer className="w-4 h-4 mr-2" />
-            Print
-          </Button>
-          <Button onClick={handleDownload} loading={downloading}>
-            <Download className="w-4 h-4 mr-2" />
-            Download PDF
-          </Button>
-        </div>
+    <>
+      <Modal isOpen={isOpen} onClose={onClose} title="GST Invoice Preview" size="large">
+        <div className="invoice-preview-container">
+          <div className="mb-6 flex justify-between items-center print:hidden">
+            <div className="flex gap-2">
+              {invoice.status !== 'paid' && (
+                <Button onClick={handleMarkAsPaid} variant="outline">
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Mark as Paid
+                </Button>
+              )}
+            </div>
+            <div className="flex gap-3">
+              <Button
+                onClick={() => setIsShareModalOpen(true)}
+                variant="outline"
+              >
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Share
+              </Button>
+              <Button onClick={handlePrint} variant="outline">
+                <Printer className="w-4 h-4 mr-2" />
+                Print
+              </Button>
+              <Button onClick={handleDownload} loading={downloading}>
+                <Download className="w-4 h-4 mr-2" />
+                Download PDF
+              </Button>
+            </div>
+          </div>
 
         <div ref={invoiceRef} className="invoice-content bg-white border-2 border-black text-xs">
           <div className="border-b-2 border-black p-2">
@@ -466,6 +494,20 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
           }
         }
       `}</style>
-    </Modal>
+      </Modal>
+
+      <ShareInvoiceModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        invoiceId={invoiceId}
+        invoiceNumber={invoice.invoice_number}
+        customerName={invoice.bill_to_name}
+        amount={invoice.grand_total}
+        onStatusUpdate={async () => {
+          await loadInvoice();
+          await refetch();
+        }}
+      />
+    </>
   );
 }

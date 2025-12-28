@@ -26,9 +26,23 @@ export interface Database {
         Insert: Omit<InvoiceSequence, 'updated_at'>;
         Update: Partial<Omit<InvoiceSequence, 'user_id' | 'updated_at'>>;
       };
+      reminder_settings: {
+        Row: ReminderSettings;
+        Insert: Omit<ReminderSettings, 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<ReminderSettings, 'user_id' | 'created_at' | 'updated_at'>>;
+      };
+      payment_reminders: {
+        Row: PaymentReminder;
+        Insert: Omit<PaymentReminder, 'id' | 'created_at'>;
+        Update: Partial<Omit<PaymentReminder, 'id' | 'created_at'>>;
+      };
     };
   };
 }
+
+export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue';
+export type SubscriptionTier = 'free' | 'starter' | 'pro' | 'business';
+export type SubscriptionStatus = 'active' | 'canceled' | 'expired';
 
 export interface Profile {
   id: string;
@@ -43,6 +57,12 @@ export interface Profile {
   account_number: string | null;
   ifsc_code: string | null;
   default_terms: string | null;
+  subscription_tier: SubscriptionTier;
+  subscription_status: SubscriptionStatus;
+  subscription_start_date: string | null;
+  subscription_end_date: string | null;
+  monthly_invoice_count: number;
+  last_reset_date: string;
   created_at: string;
   updated_at: string;
 }
@@ -64,8 +84,11 @@ export interface Customer {
 export interface Invoice {
   id: string;
   user_id: string;
+  customer_id: string | null;
   invoice_number: string;
   invoice_date: string;
+  due_date: string | null;
+  status: InvoiceStatus;
   bill_to_name: string;
   bill_to_address: string;
   bill_to_gstin: string | null;
@@ -89,8 +112,39 @@ export interface Invoice {
   account_number: string | null;
   ifsc_code: string | null;
   terms_conditions: string | null;
+  payment_date: string | null;
+  payment_method: string | null;
+  payment_link: string | null;
+  payment_id: string | null;
+  sent_date: string | null;
+  notes: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface ReminderSettings {
+  user_id: string;
+  enabled: boolean;
+  remind_before_days: number;
+  remind_on_due_date: boolean;
+  remind_after_days: number[];
+  whatsapp_enabled: boolean;
+  email_enabled: boolean;
+  message_template: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PaymentReminder {
+  id: string;
+  invoice_id: string;
+  user_id: string;
+  reminder_type: string;
+  sent_date: string;
+  delivery_status: string;
+  delivery_channel: string;
+  error_message: string | null;
+  created_at: string;
 }
 
 export interface InvoiceItem {
