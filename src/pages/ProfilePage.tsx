@@ -5,7 +5,6 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { LogoUpload } from '../components/onboarding/LogoUpload';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-import { RazorpaySettings } from '../components/settings/RazorpaySettings';
 import { validateGSTIN, validateMobile } from '../lib/utils';
 import { User, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -239,8 +238,6 @@ export function ProfilePage() {
               placeholder="Enter default terms and conditions for your invoices"
             />
           </div>
-
-          <RazorpaySettings />
 
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? 'Updating...' : 'Update Profile'}

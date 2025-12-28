@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
-import { MessageSquare, Mail, Link as LinkIcon, FileDown } from 'lucide-react';
+import { MessageSquare, Mail, FileDown } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import { getRazorpayConfig, createPaymentLink } from '../../lib/razorpay';
 import { generateAndUploadInvoicePDF, getInvoiceHTML } from '../../lib/pdfService';
 import toast from 'react-hot-toast';
 
@@ -32,8 +31,6 @@ export function ShareInvoiceModal({
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const [paymentLink, setPaymentLink] = useState('');
-  const [generatingPaymentLink, setGeneratingPaymentLink] = useState(false);
   const [pdfUrl, setPdfUrl] = useState('');
 
   useEffect(() => {
@@ -97,64 +94,11 @@ export function ShareInvoiceModal({
       const invoiceUrl = `${window.location.origin}/invoice/${invoice.share_token}`;
       const pdfDownloadText = generatedPdfUrl ? `\n\nDownload PDF: ${generatedPdfUrl}` : '';
 
-      if (invoice.payment_link) {
-        setPaymentLink(invoice.payment_link);
-        setMessage(
-          `Hi ${customerName},\n\nYour invoice ${invoiceNumber} for ₹${amount.toFixed(2)} is ready.\n\nView Invoice: ${invoiceUrl}${pdfDownloadText}\n\nPay now: ${invoice.payment_link}\n\nThank you for your business!`
-        );
-      } else {
-        setMessage(
-          `Hi ${customerName},\n\nYour invoice ${invoiceNumber} for ₹${amount.toFixed(2)} is ready.\n\nView Invoice: ${invoiceUrl}${pdfDownloadText}\n\nThank you for your business!`
-        );
-      }
+      setMessage(
+        `Hi ${customerName},\n\nYour invoice ${invoiceNumber} for ₹${amount.toFixed(2)} is ready.\n\nView Invoice: ${invoiceUrl}${pdfDownloadText}\n\nThank you for your business!`
+      );
     } catch (error) {
       console.error('Error loading customer details:', error);
-    }
-  };
-
-  const handleGeneratePaymentLink = async () => {
-    const config = getRazorpayConfig();
-    if (!config) {
-      toast.error('Please configure Razorpay in settings first');
-      return;
-    }
-
-    setGeneratingPaymentLink(true);
-    try {
-      const result = await createPaymentLink(config, {
-        amount: amount,
-        currency: 'INR',
-        description: `Payment for Invoice ${invoiceNumber}`,
-        customer: {
-          name: customerName,
-          email: email,
-          contact: phoneNumber.replace(/\D/g, '')
-        },
-        notify: {
-          sms: false,
-          email: false
-        }
-      });
-
-      if (result) {
-        await supabase
-          .from('invoices')
-          .update({ payment_link: result.short_url, payment_id: result.id })
-          .eq('id', invoiceId);
-
-        setPaymentLink(result.short_url);
-        setMessage(
-          `Hi ${customerName},\n\nPlease find your invoice ${invoiceNumber} for ₹${amount.toFixed(2)}.\n\nPay now: ${result.short_url}\n\nThank you for your business!`
-        );
-        toast.success('Payment link generated successfully');
-      } else {
-        toast.error('Failed to generate payment link');
-      }
-    } catch (error) {
-      console.error('Error generating payment link:', error);
-      toast.error('Failed to generate payment link');
-    } finally {
-      setGeneratingPaymentLink(false);
     }
   };
 
@@ -287,42 +231,6 @@ export function ShareInvoiceModal({
             )}
           </div>
         </div>
-
-        {paymentLink && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <p className="text-sm font-medium text-green-800 mb-1">Payment Link:</p>
-            <a
-              href={paymentLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-blue-600 hover:underline break-all"
-            >
-              {paymentLink}
-            </a>
-          </div>
-        )}
-
-        {!paymentLink && (
-          <details className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-            <summary className="text-sm font-medium text-gray-700 cursor-pointer">
-              Advanced: Generate Online Payment Link (Optional)
-            </summary>
-            <div className="mt-3 pt-3 border-t border-gray-300">
-              <p className="text-xs text-gray-600 mb-3">
-                Requires Razorpay account setup. Customers can pay with UPI, cards, or net banking.
-              </p>
-              <Button
-                onClick={handleGeneratePaymentLink}
-                loading={generatingPaymentLink}
-                variant="outline"
-                size="sm"
-              >
-                <LinkIcon className="w-4 h-4 mr-2" />
-                Generate Payment Link
-              </Button>
-            </div>
-          </details>
-        )}
 
         <div className="flex gap-2">
           <button
