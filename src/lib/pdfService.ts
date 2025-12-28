@@ -16,23 +16,51 @@ export async function generateAndUploadInvoicePDF(options: GeneratePDFOptions): 
     element.innerHTML = htmlContent;
     element.style.position = 'absolute';
     element.style.left = '-9999px';
+    element.style.width = '800px';
+    element.style.background = 'white';
+    element.style.padding = '20px';
     document.body.appendChild(element);
+
+    const images = element.getElementsByTagName('img');
+    if (images.length > 0) {
+      await Promise.all(
+        Array.from(images).map(img => {
+          return new Promise((resolve) => {
+            if (img.complete) {
+              resolve(true);
+            } else {
+              img.onload = () => resolve(true);
+              img.onerror = () => resolve(true);
+              setTimeout(() => resolve(true), 3000);
+            }
+          });
+        })
+      );
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     const opt = {
       margin: 10,
       filename: `invoice-${invoiceNumber}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
+      image: { type: 'jpeg', quality: 0.95 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        allowTaint: true,
+        backgroundColor: '#ffffff'
+      },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    const pdfBlob = await html2pdf().set(opt).from(element).outputPdf('blob');
+    const pdfBlob = await html2pdf().set(opt).from(element).output('blob');
 
     document.body.removeChild(element);
 
     const fileName = `${userId}/${invoiceId}/invoice-${invoiceNumber}.pdf`;
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('invoice-pdfs')
       .upload(fileName, pdfBlob, {
         contentType: 'application/pdf',
@@ -67,104 +95,105 @@ export function getInvoiceHTML(invoice: any, items: any[], profile: any): string
     <head>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.4; }
-        .invoice { border: 2px solid #000; padding: 20px; max-width: 800px; }
-        .header { border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 10px; text-align: center; }
-        .company-name { font-size: 20pt; font-weight: bold; margin-bottom: 5px; }
-        .title { font-size: 16pt; font-weight: bold; text-align: center; background: #f0f0f0; padding: 10px; margin: 10px 0; border: 1px solid #000; }
-        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid #000; margin: 10px 0; }
-        .col { padding: 10px; border-right: 1px solid #000; }
-        .col:last-child { border-right: none; }
-        .row { margin-bottom: 5px; }
+        body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; line-height: 1.3; background: white; }
+        .invoice { border: 2px solid #000; padding: 15px; background: white; width: 100%; }
+        .header { border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 8px; text-align: center; }
+        .company-logo { max-width: 70px; max-height: 70px; margin-bottom: 8px; display: block; margin-left: auto; margin-right: auto; }
+        .company-name { font-size: 18pt; font-weight: bold; margin-bottom: 4px; }
+        .title { font-size: 14pt; font-weight: bold; text-align: center; background: #e8e8e8; padding: 8px; margin: 8px 0; border: 1px solid #000; }
+        .info-section { border: 1px solid #000; margin: 8px 0; overflow: hidden; }
+        .info-row { display: table; width: 100%; }
+        .info-col { display: table-cell; width: 50%; padding: 8px; border-right: 1px solid #000; vertical-align: top; }
+        .info-col:last-child { border-right: none; }
+        .row { margin-bottom: 4px; font-size: 10pt; }
         .label { font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-        th, td { border: 1px solid #000; padding: 8px; text-align: left; }
-        th { background: #f0f0f0; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+        th, td { border: 1px solid #000; padding: 6px 4px; font-size: 10pt; }
+        th { background: #e8e8e8; font-weight: bold; }
         .text-right { text-align: right; }
         .text-center { text-align: center; }
-        .summary { border: 1px solid #000; padding: 10px; margin: 10px 0; }
-        .total-row { font-weight: bold; background: #f9f9f9; }
+        .total-row { font-weight: bold; background: #f5f5f5; }
+        .summary-section { border: 1px solid #000; margin: 8px 0; overflow: hidden; }
+        .signature { text-align: right; margin-top: 20px; padding-top: 15px; border-top: 1px solid #ccc; }
       </style>
     </head>
     <body>
       <div class="invoice">
         <div class="header">
-          ${profile.company_logo_url ? `<img src="${profile.company_logo_url}" style="max-width: 80px; max-height: 80px; margin-bottom: 10px;" />` : ''}
+          ${profile.company_logo_url ? `<img src="${profile.company_logo_url}" class="company-logo" crossorigin="anonymous" />` : ''}
           <div class="company-name">${profile.company_name}</div>
-          <div>${profile.company_address}</div>
-          ${profile.gstin ? `<div>GSTIN: ${profile.gstin}</div>` : ''}
+          <div style="font-size: 10pt;">${profile.company_address}</div>
+          ${profile.gstin ? `<div style="font-size: 10pt;">GSTIN: ${profile.gstin}</div>` : ''}
         </div>
 
         <div class="title">TAX INVOICE</div>
 
-        <div class="two-col">
-          <div class="col">
-            <div class="row"><span class="label">Invoice #:</span> ${invoice.invoice_number}</div>
-            <div class="row"><span class="label">Date:</span> ${formatDate(invoice.invoice_date)}</div>
-            <div class="row"><span class="label">Status:</span> ${invoice.status.toUpperCase()}</div>
-          </div>
-          <div class="col">
-            <div class="label">Bill To:</div>
-            <div>${invoice.bill_to_name}</div>
-            <div>${invoice.bill_to_address}</div>
-            <div>${invoice.bill_to_state}</div>
+        <div class="info-section">
+          <div class="info-row">
+            <div class="info-col">
+              <div class="row"><span class="label">Invoice #:</span> ${invoice.invoice_number}</div>
+              <div class="row"><span class="label">Date:</span> ${formatDate(invoice.invoice_date)}</div>
+              <div class="row"><span class="label">Status:</span> ${invoice.status.toUpperCase()}</div>
+            </div>
+            <div class="info-col">
+              <div class="row"><span class="label">Bill To:</span></div>
+              <div class="row">${invoice.bill_to_name}</div>
+              <div class="row">${invoice.bill_to_address}</div>
+              <div class="row">${invoice.bill_to_state}</div>
+            </div>
           </div>
         </div>
 
         <table>
           <thead>
             <tr>
-              <th style="width: 40px;">No.</th>
-              <th>Item Description</th>
-              <th style="width: 80px;" class="text-right">Rate</th>
-              <th style="width: 60px;" class="text-right">Qty</th>
-              <th style="width: 100px;" class="text-right">Amount</th>
-              <th style="width: 80px;" class="text-right">Tax</th>
+              <th style="width: 30px;" class="text-center">No.</th>
+              <th>Description</th>
+              <th style="width: 70px;" class="text-right">Rate</th>
+              <th style="width: 50px;" class="text-center">Qty</th>
+              <th style="width: 80px;" class="text-right">Amount</th>
+              <th style="width: 70px;" class="text-right">Tax</th>
             </tr>
           </thead>
           <tbody>
             ${items.map((item, index) => `
               <tr>
                 <td class="text-center">${index + 1}</td>
-                <td>
-                  ${item.product_description}
-                  ${item.hsn_code ? `<br/><small>HSN: ${item.hsn_code}</small>` : ''}
-                </td>
-                <td class="text-right">₹${item.rate.toFixed(2)}</td>
+                <td>${item.product_description}${item.hsn_code ? '<br/><span style="font-size: 9pt; color: #666;">HSN: ' + item.hsn_code + '</span>' : ''}</td>
+                <td class="text-right">Rs.${item.rate.toFixed(2)}</td>
                 <td class="text-center">${item.quantity}</td>
-                <td class="text-right">₹${item.amount.toFixed(2)}</td>
-                <td class="text-right">
-                  <small>GST ${item.gst_rate}%</small><br/>
-                  ₹${(item.cgst + item.sgst).toFixed(2)}
-                </td>
+                <td class="text-right">Rs.${item.amount.toFixed(2)}</td>
+                <td class="text-right"><span style="font-size: 9pt;">GST ${item.gst_rate}%</span><br/>Rs.${(item.cgst + item.sgst).toFixed(2)}</td>
               </tr>
             `).join('')}
           </tbody>
         </table>
 
-        <div class="two-col">
-          <div class="col">
-            ${invoice.bank_name ? `
-              <div class="label">Payment Details:</div>
-              <div class="row">Bank: ${invoice.bank_name}</div>
-              ${invoice.account_number ? `<div class="row">Account: ${invoice.account_number}</div>` : ''}
-              ${invoice.ifsc_code ? `<div class="row">IFSC: ${invoice.ifsc_code}</div>` : ''}
-            ` : ''}
-            ${profile.upi_id ? `<div class="row">UPI: ${profile.upi_id}</div>` : ''}
-          </div>
-          <div class="col">
-            <div class="row">Subtotal: <span style="float: right;">₹${invoice.subtotal.toFixed(2)}</span></div>
-            <div class="row">CGST: <span style="float: right;">₹${invoice.cgst_total.toFixed(2)}</span></div>
-            <div class="row">SGST: <span style="float: right;">₹${invoice.sgst_total.toFixed(2)}</span></div>
-            <div class="row total-row" style="margin-top: 5px; padding-top: 5px; border-top: 1px solid #000;">
-              <strong>Total: <span style="float: right;">₹${invoice.grand_total.toFixed(2)}</span></strong>
+        <div class="summary-section">
+          <div class="info-row">
+            <div class="info-col">
+              ${invoice.bank_name ? `
+                <div class="row"><span class="label">Payment Details:</span></div>
+                <div class="row">Bank: ${invoice.bank_name}</div>
+                ${invoice.account_number ? `<div class="row">A/C: ${invoice.account_number}</div>` : ''}
+                ${invoice.ifsc_code ? `<div class="row">IFSC: ${invoice.ifsc_code}</div>` : ''}
+                ${profile.upi_id ? `<div class="row">UPI: ${profile.upi_id}</div>` : ''}
+              ` : (profile.upi_id ? `<div class="row"><span class="label">UPI:</span> ${profile.upi_id}</div>` : '')}
+            </div>
+            <div class="info-col">
+              <div class="row">Subtotal: <span style="float: right;">Rs.${invoice.subtotal.toFixed(2)}</span></div>
+              <div class="row">CGST: <span style="float: right;">Rs.${invoice.cgst_total.toFixed(2)}</span></div>
+              <div class="row">SGST: <span style="float: right;">Rs.${invoice.sgst_total.toFixed(2)}</span></div>
+              <div class="row" style="margin-top: 5px; padding-top: 5px; border-top: 1px solid #000; font-weight: bold;">
+                Total: <span style="float: right;">Rs.${invoice.grand_total.toFixed(2)}</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div style="text-align: right; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ccc;">
-          <div style="font-weight: bold;">For ${profile.company_name}</div>
-          <div style="margin-top: 40px; font-size: 10pt;">Authorised Signatory</div>
+        <div class="signature">
+          <div style="font-weight: bold; font-size: 11pt;">For ${profile.company_name}</div>
+          <div style="margin-top: 30px; font-size: 9pt; color: #666;">Authorised Signatory</div>
         </div>
       </div>
     </body>
