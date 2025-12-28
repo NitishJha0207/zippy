@@ -78,6 +78,7 @@ export function ShareInvoiceModal({
         .eq('id', invoice.user_id)
         .single();
 
+      let generatedPdfUrl = '';
       if (items && profile) {
         const htmlContent = getInvoiceHTML(invoice, items, profile);
         const pdfPublicUrl = await generateAndUploadInvoicePDF({
@@ -89,11 +90,12 @@ export function ShareInvoiceModal({
 
         if (pdfPublicUrl) {
           setPdfUrl(pdfPublicUrl);
+          generatedPdfUrl = pdfPublicUrl;
         }
       }
 
       const invoiceUrl = `${window.location.origin}/invoice/${invoice.share_token}`;
-      const pdfDownloadText = pdfPublicUrl ? `\n\nDownload PDF: ${pdfPublicUrl}` : '';
+      const pdfDownloadText = generatedPdfUrl ? `\n\nDownload PDF: ${generatedPdfUrl}` : '';
 
       if (invoice.payment_link) {
         setPaymentLink(invoice.payment_link);
@@ -258,36 +260,11 @@ export function ShareInvoiceModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Share Invoice">
       <div className="space-y-4">
-        {!paymentLink && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-800 mb-2">
-              Generate a payment link to make it easy for customers to pay online
-            </p>
-            <Button
-              onClick={handleGeneratePaymentLink}
-              loading={generatingPaymentLink}
-              variant="outline"
-              size="sm"
-            >
-              <LinkIcon className="w-4 h-4 mr-2" />
-              Generate Payment Link
-            </Button>
-          </div>
-        )}
-
-        {paymentLink && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <p className="text-sm text-green-800 mb-1">Payment Link:</p>
-            <a
-              href={paymentLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-blue-600 hover:underline break-all"
-            >
-              {paymentLink}
-            </a>
-          </div>
-        )}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <p className="text-sm text-blue-800">
+            Your invoice includes your UPI ID for easy payments. Customers can scan the QR code or use your UPI ID to pay directly.
+          </p>
+        </div>
 
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
           <div className="flex items-center justify-between">
@@ -310,6 +287,42 @@ export function ShareInvoiceModal({
             )}
           </div>
         </div>
+
+        {paymentLink && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <p className="text-sm font-medium text-green-800 mb-1">Payment Link:</p>
+            <a
+              href={paymentLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-blue-600 hover:underline break-all"
+            >
+              {paymentLink}
+            </a>
+          </div>
+        )}
+
+        {!paymentLink && (
+          <details className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+            <summary className="text-sm font-medium text-gray-700 cursor-pointer">
+              Advanced: Generate Online Payment Link (Optional)
+            </summary>
+            <div className="mt-3 pt-3 border-t border-gray-300">
+              <p className="text-xs text-gray-600 mb-3">
+                Requires Razorpay account setup. Customers can pay with UPI, cards, or net banking.
+              </p>
+              <Button
+                onClick={handleGeneratePaymentLink}
+                loading={generatingPaymentLink}
+                variant="outline"
+                size="sm"
+              >
+                <LinkIcon className="w-4 h-4 mr-2" />
+                Generate Payment Link
+              </Button>
+            </div>
+          </details>
+        )}
 
         <div className="flex gap-2">
           <button
