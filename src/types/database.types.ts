@@ -56,6 +56,7 @@ export interface Profile {
   bank_name: string | null;
   account_number: string | null;
   ifsc_code: string | null;
+  upi_id: string | null;
   default_terms: string | null;
   subscription_tier: SubscriptionTier;
   subscription_status: SubscriptionStatus;
@@ -89,6 +90,7 @@ export interface Invoice {
   invoice_date: string;
   due_date: string | null;
   status: InvoiceStatus;
+  share_token: string | null;
   bill_to_name: string;
   bill_to_address: string;
   bill_to_gstin: string | null;

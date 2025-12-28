@@ -44,7 +44,7 @@ export function ShareInvoiceModal({
     try {
       const { data: invoice } = await supabase
         .from('invoices')
-        .select('customer_id, payment_link')
+        .select('customer_id, payment_link, share_token')
         .eq('id', invoiceId)
         .single();
 
@@ -61,14 +61,16 @@ export function ShareInvoiceModal({
         }
       }
 
+      const invoiceUrl = `${window.location.origin}/invoice/${invoice?.share_token}`;
+
       if (invoice?.payment_link) {
         setPaymentLink(invoice.payment_link);
         setMessage(
-          `Hi ${customerName},\n\nPlease find your invoice ${invoiceNumber} for ₹${amount.toFixed(2)}.\n\nPay now: ${invoice.payment_link}\n\nThank you for your business!`
+          `Hi ${customerName},\n\nYour invoice ${invoiceNumber} for ₹${amount.toFixed(2)} is ready.\n\nView Invoice: ${invoiceUrl}\n\nPay now: ${invoice.payment_link}\n\nThank you for your business!`
         );
       } else {
         setMessage(
-          `Hi ${customerName},\n\nPlease find your invoice ${invoiceNumber} for ₹${amount.toFixed(2)}.\n\nThank you for your business!`
+          `Hi ${customerName},\n\nYour invoice ${invoiceNumber} for ₹${amount.toFixed(2)} is ready.\n\nView Invoice: ${invoiceUrl}\n\nThank you for your business!`
         );
       }
     } catch (error) {

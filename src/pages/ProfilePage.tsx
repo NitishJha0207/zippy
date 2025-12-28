@@ -25,6 +25,7 @@ export function ProfilePage() {
     bank_name: '',
     account_number: '',
     ifsc_code: '',
+    upi_id: '',
     default_terms: ''
   });
 
@@ -43,6 +44,7 @@ export function ProfilePage() {
         bank_name: profile.bank_name || '',
         account_number: profile.account_number || '',
         ifsc_code: profile.ifsc_code || '',
+        upi_id: profile.upi_id || '',
         default_terms: profile.default_terms || ''
       });
     }
@@ -83,6 +85,7 @@ export function ProfilePage() {
       bank_name: formData.bank_name.trim() || null,
       account_number: formData.account_number.trim() || null,
       ifsc_code: formData.ifsc_code.trim() || null,
+      upi_id: formData.upi_id.trim() || null,
       company_logo_url: formData.company_logo_url || null,
       default_terms: formData.default_terms.trim() || null
     };
@@ -193,7 +196,19 @@ export function ProfilePage() {
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold mb-4">Bank Details (Optional)</h3>
+            <h3 className="text-lg font-semibold mb-4">Payment Details (Optional)</h3>
+            <div className="mb-4 p-4 bg-blue-50 rounded-lg">
+              <h4 className="font-medium text-blue-900 mb-2">UPI Payment (Recommended for Small Business)</h4>
+              <p className="text-sm text-blue-700 mb-3">
+                Simply add your UPI ID to accept payments directly. Customers can pay you via any UPI app.
+              </p>
+              <Input
+                label="UPI ID"
+                value={formData.upi_id}
+                onChange={(e) => handleChange('upi_id', e.target.value)}
+                placeholder="yourname@paytm or 9876543210@ybl"
+              />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
                 label="Bank Name"

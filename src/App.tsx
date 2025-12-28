@@ -4,6 +4,7 @@ import { AuthPage } from './pages/AuthPage';
 import { OnboardingPage } from './pages/OnboardingPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { PublicInvoicePage } from './pages/PublicInvoicePage';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { LoadingSpinner } from './components/ui/LoadingSpinner';
 
@@ -48,6 +49,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route path="/invoice/:token" element={<PublicInvoicePage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
