@@ -227,10 +227,24 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
         </div>
 
         <div ref={invoiceRef} className="invoice-content bg-white border-2 border-black text-xs">
-          <div className="border-b-2 border-black p-2 text-center">
-            <h1 className="text-lg font-bold uppercase">{profile.company_name}</h1>
-            <p className="text-xs mt-0.5">{profile.company_address}</p>
-            <p className="text-xs">GSTN: {profile.gstin || 'N/A'}</p>
+          <div className="border-b-2 border-black p-2">
+            <div className="flex items-center justify-between">
+              {profile.company_logo_url && (
+                <div className="w-20 h-20 flex-shrink-0">
+                  <img
+                    src={profile.company_logo_url}
+                    alt={profile.company_name}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              )}
+              <div className={`flex-1 ${profile.company_logo_url ? 'text-center' : 'text-center'}`}>
+                <h1 className="text-lg font-bold uppercase">{profile.company_name}</h1>
+                <p className="text-xs mt-0.5">{profile.company_address}</p>
+                <p className="text-xs">GSTN: {profile.gstin || 'N/A'}</p>
+              </div>
+              {profile.company_logo_url && <div className="w-20"></div>}
+            </div>
           </div>
 
           <div className="border-b-2 border-black p-1.5 text-center bg-gray-100">

@@ -51,6 +51,7 @@ interface InvoiceData {
     company_name: string;
     company_address: string;
     gstin: string | null;
+    company_logo_url: string | null;
   };
 }
 
@@ -104,7 +105,7 @@ function formatDate(dateString: string): string {
   return `${day}/${month}/${year}`;
 }
 
-function generateInvoicePDF(data: InvoiceData): jsPDF {
+async function generateInvoicePDF(data: InvoiceData): Promise<jsPDF> {
   const { invoice, items, profile } = data;
   const pdf = new jsPDF('p', 'mm', 'a4');
 
@@ -114,6 +115,23 @@ function generateInvoicePDF(data: InvoiceData): jsPDF {
 
   pdf.setLineWidth(0.5);
   pdf.rect(margin, margin, pageWidth - 2 * margin, pdf.internal.pageSize.getHeight() - 2 * margin);
+
+  if (profile.company_logo_url) {
+    try {
+      const logoResponse = await fetch(profile.company_logo_url);
+      const logoBlob = await logoResponse.arrayBuffer();
+      const logoBase64 = btoa(String.fromCharCode(...new Uint8Array(logoBlob)));
+      const logoExt = profile.company_logo_url.toLowerCase().includes('.png') ? 'PNG' : 'JPEG';
+
+      const logoWidth = 25;
+      const logoHeight = 25;
+      const logoX = margin + 5;
+      y += 8;
+      pdf.addImage(`data:image/${logoExt.toLowerCase()};base64,${logoBase64}`, logoExt, logoX, y, logoWidth, logoHeight);
+    } catch (error) {
+      console.error('Failed to load logo:', error);
+    }
+  }
 
   pdf.setFontSize(16);
   pdf.setFont('helvetica', 'bold');
@@ -128,7 +146,11 @@ function generateInvoicePDF(data: InvoiceData): jsPDF {
   y += 5;
   pdf.text(`GSTN: ${profile.gstin || 'N/A'}`, pageWidth / 2, y, { align: 'center' });
 
-  y += 7;
+  if (profile.company_logo_url) {
+    y += 7;
+  } else {
+    y += 7;
+  }
   pdf.line(margin, y, pageWidth - margin, y);
 
   pdf.setFontSize(12);
@@ -220,7 +242,7 @@ function generateInvoicePDF(data: InvoiceData): jsPDF {
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(7);
 
-  const colWidths = [10, 50, 20, 18, 18, 18, 20, 15, 15, 20];
+  const colWidths = [8, 40, 18, 16, 16, 15, 18, 12, 14, 18];
   let x = margin + 2;
 
   pdf.text('S.No', x, y);
@@ -408,7 +430,7 @@ Deno.serve(async (req: Request) => {
   try {
     const invoiceData: InvoiceData = await req.json();
 
-    const pdf = generateInvoicePDF(invoiceData);
+    const pdf = await generateInvoicePDF(invoiceData);
     const pdfBuffer = pdf.output('arraybuffer');
 
     return new Response(pdfBuffer, {

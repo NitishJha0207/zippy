@@ -44,6 +44,7 @@ interface InvoiceData {
     company_name: string;
     company_address: string;
     gstin: string | null;
+    company_logo_url?: string | null;
   };
 }
 
@@ -132,10 +133,29 @@ export function printInvoice(data: InvoiceData): void {
           background: white;
         }
         .header {
-          text-align: center;
           border-bottom: 2px solid #000;
           padding-bottom: 8px;
           margin-bottom: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 15px;
+        }
+        .logo-container {
+          width: 60px;
+          height: 60px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .logo-container img {
+          max-width: 100%;
+          max-height: 100%;
+          object-fit: contain;
+        }
+        .header-text {
+          text-align: center;
+          flex: 1;
         }
         .company-name {
           font-size: 18pt;
@@ -222,9 +242,17 @@ export function printInvoice(data: InvoiceData): void {
     <body>
       <div class="invoice">
         <div class="header">
-          <div class="company-name">${profile.company_name.toUpperCase()}</div>
-          <div>${profile.company_address}</div>
-          <div>GSTN: ${profile.gstin || 'N/A'}</div>
+          ${profile.company_logo_url ? `
+            <div class="logo-container">
+              <img src="${profile.company_logo_url}" alt="${profile.company_name}" />
+            </div>
+          ` : ''}
+          <div class="header-text">
+            <div class="company-name">${profile.company_name.toUpperCase()}</div>
+            <div>${profile.company_address}</div>
+            <div>GSTN: ${profile.gstin || 'N/A'}</div>
+          </div>
+          ${profile.company_logo_url ? '<div style="width: 60px;"></div>' : ''}
         </div>
 
         <div class="title text-center">Original Tax Invoice</div>
