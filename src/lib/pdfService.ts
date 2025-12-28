@@ -1,6 +1,38 @@
 import html2pdf from 'html2pdf.js';
 import { supabase } from './supabase';
-import { generateUPIQRCode } from './qrCodeGenerator';
+
+interface UPIPaymentInfo {
+  upiId: string;
+  name: string;
+  amount: number;
+  invoiceNumber: string;
+}
+
+async function generateQRCode(paymentInfo: UPIPaymentInfo): Promise<string> {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) {
+    throw new Error('Not authenticated');
+  }
+
+  const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-qr-code`;
+
+  const response = await fetch(apiUrl, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${session.access_token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(paymentInfo),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to generate QR code');
+  }
+
+  const { qrCodeDataUrl } = await response.json();
+  return qrCodeDataUrl;
+}
 
 interface GeneratePDFOptions {
   invoiceId: string;
@@ -93,7 +125,7 @@ export async function getInvoiceHTMLWithQR(invoice: any, items: any[], profile: 
   let qrCodeDataUrl = '';
   if (profile.upi_id) {
     try {
-      qrCodeDataUrl = await generateUPIQRCode({
+      qrCodeDataUrl = await generateQRCode({
         upiId: profile.upi_id,
         name: profile.company_name,
         amount: invoice.grand_total,
