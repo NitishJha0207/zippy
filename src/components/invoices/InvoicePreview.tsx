@@ -107,6 +107,7 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
   const invoiceRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -135,11 +136,47 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
 
       setInvoice(invoiceData);
       setItems(itemsData);
+
+      if (profile?.upi_id) {
+        generateQRCode(invoiceData);
+      }
     } catch (error) {
       console.error('Error loading invoice:', error);
       toast.error('Failed to load invoice');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const generateQRCode = async (invoiceData: any) => {
+    if (!profile?.upi_id) return;
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-qr-code`;
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          upiId: profile.upi_id,
+          name: profile.company_name,
+          amount: invoiceData.grand_total,
+          invoiceNumber: invoiceData.invoice_number
+        }),
+      });
+
+      if (response.ok) {
+        const { qrCodeDataUrl } = await response.json();
+        setQrCodeUrl(qrCodeDataUrl);
+      }
+    } catch (error) {
+      console.error('Error generating QR code:', error);
     }
   };
 
@@ -401,9 +438,21 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
 
           <div className="grid grid-cols-2 border-b-2 border-black min-h-[80px] text-xs">
             <div className="border-r-2 border-black p-1.5">
-              <h3 className="font-bold mb-0.5">Bank Details</h3>
+              {profile.upi_id && (
+                <>
+                  <h3 className="font-bold mb-0.5">Payment Details</h3>
+                  <p className="leading-tight"><strong>UPI ID:</strong> {profile.upi_id}</p>
+                  {qrCodeUrl && (
+                    <div className="mt-2">
+                      <p className="text-xs font-bold mb-1">Scan to Pay:</p>
+                      <img src={qrCodeUrl} alt="UPI QR Code" className="w-24 h-24" />
+                    </div>
+                  )}
+                </>
+              )}
               {invoice.bank_name && (
                 <>
+                  <h3 className={`font-bold mb-0.5 ${profile.upi_id ? 'mt-2' : ''}`}>Bank Details</h3>
                   <p className="leading-tight"><strong>Bank Name:</strong> {invoice.bank_name}</p>
                   {invoice.account_number && <p className="leading-tight"><strong>Bank A/C:</strong> {invoice.account_number}</p>}
                   {invoice.ifsc_code && <p className="leading-tight"><strong>Bank IFSC:</strong> {invoice.ifsc_code}</p>}

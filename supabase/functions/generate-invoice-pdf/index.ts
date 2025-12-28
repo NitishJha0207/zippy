@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { jsPDF } from "npm:jspdf@2.5.2";
+import QRCode from "npm:qrcode@1.5.4";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -52,6 +53,7 @@ interface InvoiceData {
     company_address: string;
     gstin: string | null;
     company_logo_url: string | null;
+    upi_id: string | null;
   };
 }
 
@@ -103,6 +105,26 @@ function formatDate(dateString: string): string {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const year = date.getFullYear();
   return `${day}/${month}/${year}`;
+}
+
+async function generateUPIQRCode(upiId: string, name: string, amount: number, invoiceNumber: string): Promise<string | null> {
+  try {
+    const upiString = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(name)}&am=${amount.toFixed(2)}&cu=INR&tn=${encodeURIComponent(`Invoice ${invoiceNumber}`)}`;
+
+    const qrCodeDataUrl = await QRCode.toDataURL(upiString, {
+      width: 200,
+      margin: 1,
+      color: {
+        dark: "#000000",
+        light: "#FFFFFF",
+      },
+    });
+
+    return qrCodeDataUrl;
+  } catch (error) {
+    console.error('Error generating QR code:', error);
+    return null;
+  }
 }
 
 async function generateInvoicePDF(data: InvoiceData): Promise<jsPDF> {
@@ -375,12 +397,48 @@ async function generateInvoicePDF(data: InvoiceData): Promise<jsPDF> {
 
   const bankTop = y;
   y += 5;
+
+  let qrCodeDataUrl: string | null = null;
+  if (profile.upi_id) {
+    qrCodeDataUrl = await generateUPIQRCode(profile.upi_id, profile.company_name, invoice.grand_total, invoice.invoice_number);
+  }
+
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(8);
-  pdf.text('Bank Details', col1X, y);
 
-  y += 5;
+  if (profile.upi_id && qrCodeDataUrl) {
+    pdf.text('Payment Details', col1X, y);
+    y += 5;
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(`UPI ID: ${profile.upi_id}`, col1X, y);
+    y += 5;
+
+    pdf.setFontSize(7);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Scan to Pay:', col1X, y);
+    y += 3;
+
+    try {
+      const qrSize = 30;
+      pdf.addImage(qrCodeDataUrl, 'PNG', col1X, y, qrSize, qrSize);
+      y += qrSize + 3;
+    } catch (error) {
+      console.error('Failed to add QR code to PDF:', error);
+    }
+
+    if (invoice.bank_name) {
+      pdf.setFontSize(8);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Bank Details', col1X, y);
+      y += 5;
+    }
+  } else if (invoice.bank_name) {
+    pdf.text('Bank Details', col1X, y);
+    y += 5;
+  }
+
   pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(8);
   if (invoice.bank_name) {
     pdf.text(`Bank Name: ${invoice.bank_name}`, col1X, y);
     y += 5;
@@ -437,7 +495,7 @@ Deno.serve(async (req: Request) => {
       headers: {
         ...corsHeaders,
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="Invoice-${invoiceData.invoice.invoice_number}.pdf"`,
+        'Content-Disposition': `attachment; filename=\"Invoice-${invoiceData.invoice.invoice_number}.pdf\"`,
       },
     });
   } catch (error) {
