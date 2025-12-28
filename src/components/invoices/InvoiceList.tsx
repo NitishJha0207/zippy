@@ -59,110 +59,112 @@ export function InvoiceList() {
         </div>
       </div>
 
-      <div className="mb-4 flex justify-between items-center">
-        <div className="flex gap-2 items-center">
-          <Filter className="w-5 h-5 text-gray-500" />
+      <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div className="flex gap-2 items-center overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
+          <Filter className="w-5 h-5 text-gray-500 flex-shrink-0" />
           <button
             onClick={() => setStatusFilter('all')}
-            className={`px-3 py-1 rounded-full text-sm ${statusFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
+            className={`px-3 py-1 rounded-full text-xs sm:text-sm whitespace-nowrap ${statusFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
           >
             All
           </button>
           <button
             onClick={() => setStatusFilter('draft')}
-            className={`px-3 py-1 rounded-full text-sm ${statusFilter === 'draft' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
+            className={`px-3 py-1 rounded-full text-xs sm:text-sm whitespace-nowrap ${statusFilter === 'draft' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
           >
             Draft
           </button>
           <button
             onClick={() => setStatusFilter('sent')}
-            className={`px-3 py-1 rounded-full text-sm ${statusFilter === 'sent' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
+            className={`px-3 py-1 rounded-full text-xs sm:text-sm whitespace-nowrap ${statusFilter === 'sent' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
           >
             Sent
           </button>
           <button
             onClick={() => setStatusFilter('paid')}
-            className={`px-3 py-1 rounded-full text-sm ${statusFilter === 'paid' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
+            className={`px-3 py-1 rounded-full text-xs sm:text-sm whitespace-nowrap ${statusFilter === 'paid' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
           >
             Paid
           </button>
           <button
             onClick={() => setStatusFilter('overdue')}
-            className={`px-3 py-1 rounded-full text-sm ${statusFilter === 'overdue' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
+            className={`px-3 py-1 rounded-full text-xs sm:text-sm whitespace-nowrap ${statusFilter === 'overdue' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
           >
             Overdue
           </button>
         </div>
-        <Button onClick={() => setIsExportModalOpen(true)} variant="outline" size="sm">
+        <Button onClick={() => setIsExportModalOpen(true)} variant="outline" size="sm" className="w-full sm:w-auto">
           <FileDown className="w-4 h-4 mr-2" />
           Export
         </Button>
       </div>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Invoice #
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Customer
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Date
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Amount
-              </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {filteredInvoices.map((invoice) => (
-              <tr key={invoice.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {invoice.invoice_number}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {invoice.customer_name}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {format(new Date(invoice.invoice_date), 'MMM dd, yyyy')}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <StatusBadge status={invoice.status} />
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  ₹{invoice.grand_total.toFixed(2)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="flex justify-end gap-2">
-                    <button
-                      onClick={() => setPreviewInvoice(invoice.id)}
-                      className="text-blue-600 hover:text-blue-900"
-                      title="Preview"
-                    >
-                      <Eye className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(invoice.id)}
-                      className="text-red-600 hover:text-red-900"
-                      title="Delete"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </div>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Invoice #
+                </th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Customer
+                </th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date
+                </th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Amount
+                </th>
+                <th className="px-3 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredInvoices.map((invoice) => (
+                <tr key={invoice.id} className="hover:bg-gray-50">
+                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
+                    {invoice.invoice_number}
+                  </td>
+                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
+                    {invoice.customer_name}
+                  </td>
+                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                    {format(new Date(invoice.invoice_date), 'MMM dd, yyyy')}
+                  </td>
+                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                    <StatusBadge status={invoice.status} />
+                  </td>
+                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
+                    ₹{invoice.grand_total.toFixed(2)}
+                  </td>
+                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-right text-xs sm:text-sm font-medium">
+                    <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() => setPreviewInvoice(invoice.id)}
+                        className="text-blue-600 hover:text-blue-900"
+                        title="Preview"
+                      >
+                        <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(invoice.id)}
+                        className="text-red-600 hover:text-red-900"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {previewInvoice && (

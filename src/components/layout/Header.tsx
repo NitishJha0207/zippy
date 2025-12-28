@@ -13,35 +13,42 @@ export function Header() {
     <header className="bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center gap-3">
-            <FileText className="w-8 h-8 text-blue-600" />
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">Invoice Generator</h1>
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+            <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 flex-shrink-0" />
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-xl font-bold text-gray-900 truncate">Invoice Generator</h1>
               {profile && (
-                <p className="text-xs text-gray-500">{profile.company_name}</p>
+                <p className="text-xs text-gray-500 truncate hidden sm:block">{profile.company_name}</p>
               )}
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
             <Button
               variant="outline"
               onClick={() => navigate('/analytics')}
-              className="flex items-center gap-2"
+              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4"
+              size="sm"
             >
               <TrendingUp className="w-4 h-4" />
-              Analytics
+              <span className="hidden sm:inline">Analytics</span>
             </Button>
             <Button
               variant="outline"
               onClick={() => navigate('/profile')}
-              className="flex items-center gap-2"
+              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4"
+              size="sm"
             >
               <User className="w-4 h-4" />
-              Settings
+              <span className="hidden sm:inline">Settings</span>
             </Button>
-            <Button variant="outline" onClick={signOut} className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={signOut}
+              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4"
+              size="sm"
+            >
               <LogOut className="w-4 h-4" />
-              Sign Out
+              <span className="hidden sm:inline">Sign Out</span>
             </Button>
           </div>
         </div>

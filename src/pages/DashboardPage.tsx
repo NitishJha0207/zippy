@@ -88,12 +88,12 @@ export function DashboardPage() {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+      <div>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 break-words">
             Welcome back, {profile.user_name}!
           </h1>
-          <p className="text-gray-600">{profile.company_name}</p>
+          <p className="text-sm sm:text-base text-gray-600 break-words">{profile.company_name}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -114,28 +114,28 @@ export function DashboardPage() {
 
         <div className="bg-white rounded-lg shadow">
           <div className="border-b border-gray-200">
-            <div className="flex justify-between items-center px-6 py-4">
-              <nav className="flex space-x-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-4 sm:px-6 py-4 gap-4">
+              <nav className="flex space-x-4 sm:space-x-8 w-full sm:w-auto overflow-x-auto">
                 <button
                   onClick={() => setActiveTab('invoices')}
-                  className={`pb-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  className={`pb-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
                     activeTab === 'invoices'
                       ? 'border-blue-500 text-blue-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
-                  <FileText className="w-5 h-5 inline mr-2" />
+                  <FileText className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 sm:mr-2" />
                   Invoices
                 </button>
                 <button
                   onClick={() => setActiveTab('customers')}
-                  className={`pb-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  className={`pb-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
                     activeTab === 'customers'
                       ? 'border-blue-500 text-blue-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
-                  <Users className="w-5 h-5 inline mr-2" />
+                  <Users className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 sm:mr-2" />
                   Customers
                 </button>
               </nav>
@@ -153,14 +153,15 @@ export function DashboardPage() {
                     setIsCustomerModalOpen(true);
                   }
                 }}
+                className="w-full sm:w-auto"
               >
-                <Plus className="w-5 h-5 mr-2" />
-                {activeTab === 'invoices' ? 'New Invoice' : 'New Customer'}
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                <span className="text-sm sm:text-base">{activeTab === 'invoices' ? 'New Invoice' : 'New Customer'}</span>
               </Button>
             </div>
           </div>
 
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             {activeTab === 'invoices' && <InvoiceList />}
             {activeTab === 'customers' && (
               <div className="space-y-4">
