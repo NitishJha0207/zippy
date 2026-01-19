@@ -92,7 +92,7 @@ export function useInvoices() {
   };
 
   const getNextInvoiceNumber = async (): Promise<string> => {
-    if (!user) return 'INV-001';
+    if (!user) return '101';
 
     try {
       const { data: sequence, error } = await supabase
@@ -106,15 +106,15 @@ export function useInvoices() {
       if (!sequence) {
         await supabase
           .from('invoice_sequence')
-          .insert([{ user_id: user.id, last_invoice_number: 0, prefix: 'INV' }]);
-        return 'INV-001';
+          .insert([{ user_id: user.id, last_invoice_number: 100, prefix: '' }]);
+        return '101';
       }
 
       const nextNumber = sequence.last_invoice_number + 1;
-      return `${sequence.prefix}-${nextNumber.toString().padStart(3, '0')}`;
+      return nextNumber.toString();
     } catch (error) {
       console.error('Error getting invoice number:', error);
-      return 'INV-001';
+      return '101';
     }
   };
 
