@@ -264,7 +264,7 @@ async function generateInvoicePDF(data: InvoiceData): Promise<jsPDF> {
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(7);
 
-  const colWidths = [8, 40, 18, 16, 16, 15, 18, 12, 14, 18];
+  const colWidths = [8, 35, 16, 12, 12, 14, 13, 16, 10, 12, 16];
   let x = margin + 2;
 
   pdf.text('S.No', x, y);
@@ -273,19 +273,21 @@ async function generateInvoicePDF(data: InvoiceData): Promise<jsPDF> {
   x += colWidths[1];
   pdf.text('Students/Staff', x, y);
   x += colWidths[2];
-  pdf.text('Rate', x + 8, y);
+  pdf.text('Qty', x + 4, y);
   x += colWidths[3];
-  pdf.text('Amount', x + 6, y);
+  pdf.text('Rate', x + 5, y);
   x += colWidths[4];
-  pdf.text('HSN', x + 4, y);
+  pdf.text('Amount', x + 5, y);
   x += colWidths[5];
-  pdf.text('Tax Value', x + 5, y);
+  pdf.text('HSN', x + 4, y);
   x += colWidths[6];
-  pdf.text('Rate', x + 4, y);
+  pdf.text('Tax Value', x + 5, y);
   x += colWidths[7];
-  pdf.text('GST', x + 4, y);
+  pdf.text('Rate', x + 3, y);
   x += colWidths[8];
-  pdf.text('Total', x + 6, y);
+  pdf.text('GST', x + 3, y);
+  x += colWidths[9];
+  pdf.text('Total', x + 5, y);
 
   y += 5;
   pdf.line(margin, tableTop, pageWidth - margin, tableTop);
@@ -312,25 +314,28 @@ async function generateInvoicePDF(data: InvoiceData): Promise<jsPDF> {
     pdf.text(item.students_staff || '-', x + 4, y);
     x += colWidths[2];
 
-    pdf.text(item.rate.toFixed(2), x + 10, y);
+    pdf.text(item.quantity.toFixed(2), x + 5, y);
     x += colWidths[3];
 
-    pdf.text(item.amount.toFixed(2), x + 8, y);
+    pdf.text(item.rate.toFixed(2), x + 6, y);
     x += colWidths[4];
 
-    pdf.text(item.hsn_code || '-', x + 4, y);
+    pdf.text(item.amount.toFixed(2), x + 6, y);
     x += colWidths[5];
 
-    pdf.text(item.taxable_value.toFixed(2), x + 8, y);
+    pdf.text(item.hsn_code || '-', x + 4, y);
     x += colWidths[6];
 
-    pdf.text(`${item.gst_rate}%`, x + 4, y);
+    pdf.text(item.taxable_value.toFixed(2), x + 6, y);
     x += colWidths[7];
 
-    pdf.text((item.cgst + item.sgst).toFixed(2), x + 6, y);
+    pdf.text(`${item.gst_rate}%`, x + 3, y);
     x += colWidths[8];
 
-    pdf.text((item.taxable_value + item.cgst + item.sgst).toFixed(2), x + 8, y);
+    pdf.text((item.cgst + item.sgst).toFixed(2), x + 4, y);
+    x += colWidths[9];
+
+    pdf.text((item.taxable_value + item.cgst + item.sgst).toFixed(2), x + 6, y);
 
     const lineHeight = Math.max(descLines.length * 4, 5);
     y += lineHeight;
@@ -341,15 +346,15 @@ async function generateInvoicePDF(data: InvoiceData): Promise<jsPDF> {
   y += 5;
   x = margin + 2;
 
-  pdf.text('Total', x + colWidths[0] + 20, y);
-  x += colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3];
-  pdf.text(invoice.subtotal.toFixed(2), x + 8, y);
-  x += colWidths[4] + colWidths[5];
-  pdf.text(invoice.subtotal.toFixed(2), x + 8, y);
-  x += colWidths[6] + colWidths[7];
-  pdf.text(invoice.total_tax.toFixed(2), x + 6, y);
-  x += colWidths[8];
-  pdf.text(invoice.grand_total.toFixed(2), x + 8, y);
+  pdf.text('Total', x + colWidths[0] + 18, y);
+  x += colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4];
+  pdf.text(invoice.subtotal.toFixed(2), x + 6, y);
+  x += colWidths[5] + colWidths[6];
+  pdf.text(invoice.subtotal.toFixed(2), x + 6, y);
+  x += colWidths[7] + colWidths[8];
+  pdf.text(invoice.total_tax.toFixed(2), x + 4, y);
+  x += colWidths[9];
+  pdf.text(invoice.grand_total.toFixed(2), x + 6, y);
 
   y += 7;
   pdf.line(margin, y, pageWidth - margin, y);
