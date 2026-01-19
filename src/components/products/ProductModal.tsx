@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { X, RefreshCw } from 'lucide-react';
 import { Modal } from '../ui/Modal';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
@@ -17,7 +16,6 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    barcode: '',
     sku: '',
     price: '',
     hsn_code: '',
@@ -34,7 +32,6 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
       setFormData({
         name: product.name,
         description: product.description || '',
-        barcode: product.barcode,
         sku: product.sku || '',
         price: product.price.toString(),
         hsn_code: product.hsn_code || '',
@@ -47,13 +44,6 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
     }
   }, [product]);
 
-  const generateBarcode = () => {
-    const timestamp = Date.now().toString();
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    const barcode = timestamp.slice(-9) + random;
-    setFormData({ ...formData, barcode });
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -61,7 +51,6 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
     const productData = {
       name: formData.name,
       description: formData.description || null,
-      barcode: formData.barcode,
       sku: formData.sku || null,
       price: parseFloat(formData.price) || 0,
       hsn_code: formData.hsn_code || null,
@@ -113,31 +102,6 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Enter product description"
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Barcode *
-            </label>
-            <div className="flex gap-2">
-              <Input
-                type="text"
-                value={formData.barcode}
-                onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
-                placeholder="Enter or generate barcode"
-                required
-              />
-              <Button
-                type="button"
-                variant="outline"
-                onClick={generateBarcode}
-                className="flex items-center gap-1 whitespace-nowrap"
-                title="Auto-generate barcode"
-              >
-                <RefreshCw className="w-4 h-4" />
-                Generate
-              </Button>
-            </div>
           </div>
 
           <div>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Package, Plus, Search, Edit2, Trash2, Printer } from 'lucide-react';
+import { Package, Plus, Search, Edit2, Trash2 } from 'lucide-react';
 import { Layout } from '../components/layout/Layout';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -16,7 +16,6 @@ export function ProductsPage() {
 
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    product.barcode.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (product.sku && product.sku.toLowerCase().includes(searchQuery.toLowerCase())) ||
     (product.category && product.category.toLowerCase().includes(searchQuery.toLowerCase()))
   );
@@ -37,76 +36,6 @@ export function ProductsPage() {
     setEditingProduct(undefined);
   };
 
-  const handlePrintLabel = (product: Product) => {
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
-
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Print Label - ${product.name}</title>
-          <style>
-            body {
-              margin: 0;
-              padding: 20px;
-              font-family: Arial, sans-serif;
-            }
-            .label {
-              width: 300px;
-              border: 2px solid #000;
-              padding: 15px;
-              text-align: center;
-            }
-            .product-name {
-              font-size: 18px;
-              font-weight: bold;
-              margin-bottom: 10px;
-            }
-            .barcode-container {
-              margin: 15px 0;
-            }
-            .product-info {
-              font-size: 14px;
-              margin-top: 10px;
-            }
-            @media print {
-              body {
-                padding: 0;
-              }
-            }
-          </style>
-          <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-        </head>
-        <body>
-          <div class="label">
-            <div class="product-name">${product.name}</div>
-            <div class="barcode-container">
-              <svg id="barcode"></svg>
-            </div>
-            <div class="product-info">
-              <div>Price: ₹${product.price.toFixed(2)}</div>
-              ${product.sku ? `<div>SKU: ${product.sku}</div>` : ''}
-            </div>
-          </div>
-          <script>
-            JsBarcode("#barcode", "${product.barcode}", {
-              format: "CODE128",
-              width: 2,
-              height: 60,
-              displayValue: true,
-              fontSize: 14
-            });
-            window.onload = function() {
-              window.print();
-              setTimeout(() => window.close(), 100);
-            };
-          </script>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-  };
 
   if (loading) {
     return (
@@ -137,7 +66,7 @@ export function ProductsPage() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
               type="text"
-              placeholder="Search products by name, barcode, SKU, or category..."
+              placeholder="Search products by name, SKU, or category..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -173,9 +102,6 @@ export function ProductsPage() {
                       Product
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Barcode
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Price
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -204,9 +130,6 @@ export function ProductsPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        {product.barcode}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
                         ₹{product.price.toFixed(2)}
                         <span className="text-xs text-gray-500"> /{product.unit}</span>
                       </td>
@@ -224,14 +147,6 @@ export function ProductsPage() {
                       </td>
                       <td className="px-6 py-4 text-right text-sm font-medium">
                         <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handlePrintLabel(product)}
-                            className="flex items-center gap-1"
-                          >
-                            <Printer className="w-4 h-4" />
-                          </Button>
                           <Button
                             variant="outline"
                             size="sm"

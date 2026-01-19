@@ -106,32 +106,12 @@ export function useProducts() {
     }
   };
 
-  const getProductByBarcode = async (barcode: string) => {
-    if (!user || !barcode) return { data: null, error: 'Invalid request' };
-
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('barcode', barcode)
-        .maybeSingle();
-
-      if (error) throw error;
-      return { data, error: null };
-    } catch (error: any) {
-      console.error('Error fetching product by barcode:', error);
-      return { data: null, error: error.message };
-    }
-  };
-
   return {
     products,
     loading,
     createProduct,
     updateProduct,
     deleteProduct,
-    getProductByBarcode,
     refetch: fetchProducts
   };
 }

@@ -12,7 +12,6 @@ import toast from 'react-hot-toast';
 interface InvoiceItem {
   product_description: string;
   hsn_code: string;
-  barcode: string;
   quantity: number;
   rate: number;
   gst_rate: number;
@@ -67,7 +66,7 @@ export function InvoiceForm({ isOpen, onClose, onSave }: InvoiceFormProps) {
   });
 
   const [items, setItems] = useState<InvoiceItem[]>([
-    { product_description: '', hsn_code: '', barcode: '', quantity: 1, rate: 0, gst_rate: 18 }
+    { product_description: '', hsn_code: '', quantity: 1, rate: 0, gst_rate: 18 }
   ]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -142,12 +141,12 @@ export function InvoiceForm({ isOpen, onClose, onSave }: InvoiceFormProps) {
       ship_to_state_code: '',
       terms_conditions: profile?.default_terms || ''
     });
-    setItems([{ product_description: '', hsn_code: '', barcode: '', quantity: 1, rate: 0, gst_rate: 18 }]);
+    setItems([{ product_description: '', hsn_code: '', quantity: 1, rate: 0, gst_rate: 18 }]);
     setErrors({});
   };
 
   const addItem = () => {
-    setItems([...items, { product_description: '', hsn_code: '', barcode: '', quantity: 1, rate: 0, gst_rate: 18 }]);
+    setItems([...items, { product_description: '', hsn_code: '', quantity: 1, rate: 0, gst_rate: 18 }]);
   };
 
   const removeItem = (index: number) => {
@@ -330,7 +329,6 @@ export function InvoiceForm({ isOpen, onClose, onSave }: InvoiceFormProps) {
                   <th className="px-2 py-2 text-left text-xs font-medium text-gray-700">S.No</th>
                   <th className="px-2 py-2 text-left text-xs font-medium text-gray-700">Product/Service</th>
                   <th className="px-2 py-2 text-left text-xs font-medium text-gray-700">HSN</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-700">Barcode</th>
                   <th className="px-2 py-2 text-right text-xs font-medium text-gray-700">Qty</th>
                   <th className="px-2 py-2 text-right text-xs font-medium text-gray-700">Rate</th>
                   <th className="px-2 py-2 text-right text-xs font-medium text-gray-700">Amount</th>
@@ -357,13 +355,6 @@ export function InvoiceForm({ isOpen, onClose, onSave }: InvoiceFormProps) {
                         placeholder="HSN Code"
                         value={item.hsn_code}
                         onChange={(e) => updateItem(index, 'hsn_code', e.target.value)}
-                      />
-                    </td>
-                    <td className="px-2 py-2">
-                      <Input
-                        placeholder="Barcode (optional)"
-                        value={item.barcode}
-                        onChange={(e) => updateItem(index, 'barcode', e.target.value)}
                       />
                     </td>
                     <td className="px-2 py-2">

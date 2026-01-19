@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
-import { BarcodeDisplay } from '../ui/BarcodeDisplay';
 import { Download, Printer, MessageSquare, CheckCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useProfile } from '../../hooks/useProfile';
@@ -358,7 +357,6 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
               <tr className="border-b-2 border-black">
                 <th className="border-r-2 border-black p-1 text-left w-8">S. No.</th>
                 <th className="border-r-2 border-black p-1 text-left">Product Description</th>
-                <th className="border-r-2 border-black p-1 text-center w-24">Barcode</th>
                 <th className="border-r-2 border-black p-1 text-right w-12">Qty</th>
                 <th className="border-r-2 border-black p-1 text-right w-16">Rate</th>
                 <th className="border-r-2 border-black p-1 text-right w-16">Amount</th>
@@ -368,7 +366,6 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
                 <th className="border-black p-1 text-right w-20">Total</th>
               </tr>
               <tr className="border-b border-black bg-gray-50">
-                <th className="border-r-2 border-black"></th>
                 <th className="border-r-2 border-black"></th>
                 <th className="border-r-2 border-black"></th>
                 <th className="border-r-2 border-black"></th>
@@ -386,11 +383,6 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
                 <tr key={index} className="border-b border-black">
                   <td className="border-r-2 border-black p-1 text-center">{index + 1}</td>
                   <td className="border-r-2 border-black p-1">{item.product_description}</td>
-                  <td className="border-r-2 border-black p-1 text-center">
-                    {item.barcode && (
-                      <BarcodeDisplay value={item.barcode} width={1} height={30} fontSize={8} />
-                    )}
-                  </td>
                   <td className="border-r-2 border-black p-1 text-right">{item.quantity}</td>
                   <td className="border-r-2 border-black p-1 text-right">{item.rate.toFixed(2)}</td>
                   <td className="border-r-2 border-black p-1 text-right">{item.amount.toFixed(2)}</td>
@@ -402,7 +394,7 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
                 </tr>
               ))}
               <tr className="border-b-2 border-black font-bold bg-gray-50">
-                <td colSpan={5} className="border-r-2 border-black p-1 text-right">Total</td>
+                <td colSpan={4} className="border-r-2 border-black p-1 text-right">Total</td>
                 <td className="border-r-2 border-black p-1 text-right">{invoice.subtotal.toFixed(2)}</td>
                 <td className="border-r-2 border-black"></td>
                 <td className="border-r-2 border-black p-1 text-right">{invoice.subtotal.toFixed(2)}</td>
