@@ -11,11 +11,6 @@ export interface Database {
         Insert: Omit<Customer, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<Customer, 'id' | 'user_id' | 'created_at' | 'updated_at'>>;
       };
-      products: {
-        Row: Product;
-        Insert: Omit<Product, 'id' | 'created_at' | 'updated_at'>;
-        Update: Partial<Omit<Product, 'id' | 'user_id' | 'created_at' | 'updated_at'>>;
-      };
       invoices: {
         Row: Invoice;
         Insert: Omit<Invoice, 'id' | 'created_at' | 'updated_at'>;
@@ -177,22 +172,5 @@ export interface InvoiceSequence {
   user_id: string;
   last_invoice_number: number;
   prefix: string;
-  updated_at: string;
-}
-
-export interface Product {
-  id: string;
-  user_id: string;
-  name: string;
-  description: string | null;
-  sku: string | null;
-  price: number;
-  hsn_code: string | null;
-  tax_rate: number;
-  unit: string;
-  stock_quantity: number | null;
-  low_stock_alert: number | null;
-  category: string | null;
-  created_at: string;
   updated_at: string;
 }

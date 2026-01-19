@@ -6,7 +6,6 @@ import { DashboardPage } from './pages/DashboardPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { PublicInvoicePage } from './pages/PublicInvoicePage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
-import { ProductsPage } from './pages/ProductsPage';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { LoadingSpinner } from './components/ui/LoadingSpinner';
 
@@ -56,14 +55,6 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <AnalyticsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/products"
-        element={
-          <ProtectedRoute>
-            <ProductsPage />
           </ProtectedRoute>
         }
       />
