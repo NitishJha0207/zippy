@@ -305,7 +305,7 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
               )}
               <div className={`flex-1 ${profile.company_logo_url ? 'text-center' : 'text-center'}`}>
                 <h1 className="text-lg font-bold uppercase">{profile.company_name}</h1>
-                <p className="text-xs mt-0.5">{profile.company_address}</p>
+                <p className="text-xs mt-0.5">{profile.company_address}{profile.pincode ? `, ${profile.pincode}` : ''}</p>
                 <p className="text-xs">GSTN: {profile.gstin || 'N/A'}</p>
               </div>
               {profile.company_logo_url && <div className="w-20"></div>}
@@ -354,6 +354,7 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
                 <th className="border-r-2 border-black p-1 text-left w-8">S. No.</th>
                 <th className="border-r-2 border-black p-1 text-left">Product Description</th>
                 <th className="border-r-2 border-black p-1 text-left w-20">Students/Staff</th>
+                <th className="border-r-2 border-black p-1 text-right w-12">Qty</th>
                 <th className="border-r-2 border-black p-1 text-right w-16">Rate</th>
                 <th className="border-r-2 border-black p-1 text-right w-16">Amount</th>
                 <th className="border-r-2 border-black p-1 text-center w-16">HSN CODE</th>
@@ -362,6 +363,7 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
                 <th className="border-black p-1 text-right w-20">Total</th>
               </tr>
               <tr className="border-b border-black bg-gray-50">
+                <th className="border-r-2 border-black"></th>
                 <th className="border-r-2 border-black"></th>
                 <th className="border-r-2 border-black"></th>
                 <th className="border-r-2 border-black"></th>
@@ -380,6 +382,7 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
                   <td className="border-r-2 border-black p-1 text-center">{index + 1}</td>
                   <td className="border-r-2 border-black p-1">{item.product_description}</td>
                   <td className="border-r-2 border-black p-1 text-center">{item.students_staff || '-'}</td>
+                  <td className="border-r-2 border-black p-1 text-right">{item.quantity}</td>
                   <td className="border-r-2 border-black p-1 text-right">{item.rate.toFixed(2)}</td>
                   <td className="border-r-2 border-black p-1 text-right">{item.amount.toFixed(2)}</td>
                   <td className="border-r-2 border-black p-1 text-center">{item.hsn_code || '-'}</td>
@@ -390,7 +393,7 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
                 </tr>
               ))}
               <tr className="border-b-2 border-black font-bold bg-gray-50">
-                <td colSpan={4} className="border-r-2 border-black p-1 text-right">Total</td>
+                <td colSpan={5} className="border-r-2 border-black p-1 text-right">Total</td>
                 <td className="border-r-2 border-black p-1 text-right">{invoice.subtotal.toFixed(2)}</td>
                 <td className="border-r-2 border-black"></td>
                 <td className="border-r-2 border-black p-1 text-right">{invoice.subtotal.toFixed(2)}</td>

@@ -43,6 +43,7 @@ interface InvoiceData {
   profile: {
     company_name: string;
     company_address: string;
+    pincode: string | null;
     gstin: string | null;
     company_logo_url?: string | null;
   };
@@ -249,7 +250,7 @@ export function printInvoice(data: InvoiceData): void {
           ` : ''}
           <div class="header-text">
             <div class="company-name">${profile.company_name.toUpperCase()}</div>
-            <div>${profile.company_address}</div>
+            <div>${profile.company_address}${profile.pincode ? `, ${profile.pincode}` : ''}</div>
             <div>GSTN: ${profile.gstin || 'N/A'}</div>
           </div>
           ${profile.company_logo_url ? '<div style="width: 60px;"></div>' : ''}
@@ -293,6 +294,7 @@ export function printInvoice(data: InvoiceData): void {
               <th style="width: 30px;">S.No</th>
               <th>Product Description</th>
               <th style="width: 80px;">Students/Staff</th>
+              <th style="width: 40px;" class="text-right">Qty</th>
               <th style="width: 60px;" class="text-right">Rate</th>
               <th style="width: 60px;" class="text-right">Amount</th>
               <th style="width: 50px;">HSN</th>
@@ -308,6 +310,7 @@ export function printInvoice(data: InvoiceData): void {
                 <td class="text-center">${index + 1}</td>
                 <td>${item.product_description}</td>
                 <td>${item.students_staff || '-'}</td>
+                <td class="text-right">${item.quantity}</td>
                 <td class="text-right">${item.rate.toFixed(2)}</td>
                 <td class="text-right">${item.amount.toFixed(2)}</td>
                 <td class="text-center">${item.hsn_code || '-'}</td>
@@ -318,7 +321,7 @@ export function printInvoice(data: InvoiceData): void {
               </tr>
             `).join('')}
             <tr style="font-weight: bold;">
-              <td colspan="4" class="text-right">Total</td>
+              <td colspan="5" class="text-right">Total</td>
               <td class="text-right">${invoice.subtotal.toFixed(2)}</td>
               <td></td>
               <td class="text-right">${invoice.subtotal.toFixed(2)}</td>

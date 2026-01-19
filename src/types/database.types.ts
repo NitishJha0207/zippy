@@ -51,6 +51,7 @@ export interface Profile {
   email: string;
   company_name: string;
   company_address: string;
+  pincode: string | null;
   gstin: string | null;
   company_logo_url: string | null;
   bank_name: string | null;

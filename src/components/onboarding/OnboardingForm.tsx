@@ -17,6 +17,7 @@ export function OnboardingForm() {
     email: '',
     company_name: '',
     company_address: '',
+    pincode: '',
     gstin: '',
     company_logo_url: '',
     bank_name: '',
@@ -58,6 +59,7 @@ export function OnboardingForm() {
     setLoading(true);
     const profileData = {
       ...formData,
+      pincode: formData.pincode.trim() || null,
       gstin: formData.gstin.trim() || null,
       bank_name: formData.bank_name.trim() || null,
       account_number: formData.account_number.trim() || null,
@@ -130,6 +132,12 @@ export function OnboardingForm() {
             error={errors.company_address}
             required
             className="md:col-span-2"
+          />
+          <Input
+            label="Pincode"
+            value={formData.pincode}
+            onChange={(e) => handleChange('pincode', e.target.value)}
+            placeholder="Postal/ZIP code"
           />
           <Input
             label="GSTIN (Optional)"

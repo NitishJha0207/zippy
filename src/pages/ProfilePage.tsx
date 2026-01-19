@@ -23,6 +23,7 @@ export function ProfilePage() {
     email: '',
     company_name: '',
     company_address: '',
+    pincode: '',
     gstin: '',
     company_logo_url: '',
     bank_name: '',
@@ -42,6 +43,7 @@ export function ProfilePage() {
         email: profile.email || '',
         company_name: profile.company_name || '',
         company_address: profile.company_address || '',
+        pincode: profile.pincode || '',
         gstin: profile.gstin || '',
         company_logo_url: profile.company_logo_url || '',
         bank_name: profile.bank_name || '',
@@ -84,6 +86,7 @@ export function ProfilePage() {
     setLoading(true);
     const profileData = {
       ...formData,
+      pincode: formData.pincode.trim() || null,
       gstin: formData.gstin.trim() || null,
       bank_name: formData.bank_name.trim() || null,
       account_number: formData.account_number.trim() || null,
@@ -211,6 +214,12 @@ export function ProfilePage() {
                 error={errors.company_address}
                 required
                 className="md:col-span-2"
+              />
+              <Input
+                label="Pincode"
+                value={formData.pincode}
+                onChange={(e) => handleChange('pincode', e.target.value)}
+                placeholder="Postal/ZIP code"
               />
               <Input
                 label="GSTIN (Optional)"
