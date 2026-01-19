@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, RefreshCw } from 'lucide-react';
 import { Modal } from '../ui/Modal';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
@@ -46,6 +46,13 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
       });
     }
   }, [product]);
+
+  const generateBarcode = () => {
+    const timestamp = Date.now().toString();
+    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    const barcode = timestamp.slice(-9) + random;
+    setFormData({ ...formData, barcode });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,13 +119,25 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Barcode *
             </label>
-            <Input
-              type="text"
-              value={formData.barcode}
-              onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
-              placeholder="Enter barcode"
-              required
-            />
+            <div className="flex gap-2">
+              <Input
+                type="text"
+                value={formData.barcode}
+                onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
+                placeholder="Enter or generate barcode"
+                required
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={generateBarcode}
+                className="flex items-center gap-1 whitespace-nowrap"
+                title="Auto-generate barcode"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Generate
+              </Button>
+            </div>
           </div>
 
           <div>
