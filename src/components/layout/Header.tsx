@@ -1,4 +1,4 @@
-import { FileText, LogOut, User, TrendingUp } from 'lucide-react';
+import { FileText, LogOut, User, TrendingUp, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProfile } from '../../hooks/useProfile';
@@ -25,9 +25,16 @@ export function Header() {
           <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
             <Button
               variant="outline"
+              onClick={() => navigate('/products')}
+              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4"
+            >
+              <Package className="w-4 h-4" />
+              <span className="hidden sm:inline">Products</span>
+            </Button>
+            <Button
+              variant="outline"
               onClick={() => navigate('/analytics')}
               className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4"
-              size="sm"
             >
               <TrendingUp className="w-4 h-4" />
               <span className="hidden sm:inline">Analytics</span>
@@ -36,7 +43,6 @@ export function Header() {
               variant="outline"
               onClick={() => navigate('/profile')}
               className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4"
-              size="sm"
             >
               <User className="w-4 h-4" />
               <span className="hidden sm:inline">Settings</span>
@@ -45,7 +51,6 @@ export function Header() {
               variant="outline"
               onClick={signOut}
               className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4"
-              size="sm"
             >
               <LogOut className="w-4 h-4" />
               <span className="hidden sm:inline">Sign Out</span>
