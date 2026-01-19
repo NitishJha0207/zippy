@@ -55,6 +55,7 @@ interface InvoiceData {
     company_logo_url: string | null;
     upi_id: string | null;
     mobile_number: string;
+    secondary_mobile_number: string | null;
     email: string;
   };
 }
@@ -172,7 +173,10 @@ async function generateInvoicePDF(data: InvoiceData): Promise<jsPDF> {
   pdf.text(`GSTN: ${profile.gstin || 'N/A'}`, pageWidth / 2, y, { align: 'center' });
 
   y += 5;
-  pdf.text(`Mobile: ${profile.mobile_number} | Email: ${profile.email}`, pageWidth / 2, y, { align: 'center' });
+  const mobileText = profile.secondary_mobile_number
+    ? `Mobile: ${profile.mobile_number} / ${profile.secondary_mobile_number} | Email: ${profile.email}`
+    : `Mobile: ${profile.mobile_number} | Email: ${profile.email}`;
+  pdf.text(mobileText, pageWidth / 2, y, { align: 'center' });
 
   if (profile.company_logo_url) {
     y += 7;

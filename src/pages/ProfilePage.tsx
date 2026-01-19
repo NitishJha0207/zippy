@@ -20,6 +20,7 @@ export function ProfilePage() {
   const [formData, setFormData] = useState({
     user_name: '',
     mobile_number: '',
+    secondary_mobile_number: '',
     email: '',
     company_name: '',
     company_address: '',
@@ -40,6 +41,7 @@ export function ProfilePage() {
       setFormData({
         user_name: profile.user_name || '',
         mobile_number: profile.mobile_number || '',
+        secondary_mobile_number: profile.secondary_mobile_number || '',
         email: profile.email || '',
         company_name: profile.company_name || '',
         company_address: profile.company_address || '',
@@ -64,6 +66,9 @@ export function ProfilePage() {
     } else if (!validateMobile(formData.mobile_number)) {
       newErrors.mobile_number = 'Invalid mobile number';
     }
+    if (formData.secondary_mobile_number.trim() && !validateMobile(formData.secondary_mobile_number)) {
+      newErrors.secondary_mobile_number = 'Invalid mobile number';
+    }
     if (!formData.email.trim()) newErrors.email = 'Email is required';
     if (!formData.company_name.trim()) newErrors.company_name = 'Company name is required';
     if (!formData.company_address.trim()) newErrors.company_address = 'Address is required';
@@ -86,6 +91,7 @@ export function ProfilePage() {
     setLoading(true);
     const profileData = {
       ...formData,
+      secondary_mobile_number: formData.secondary_mobile_number.trim() || null,
       pincode: formData.pincode.trim() || null,
       gstin: formData.gstin.trim() || null,
       bank_name: formData.bank_name.trim() || null,
@@ -183,6 +189,13 @@ export function ProfilePage() {
                 error={errors.mobile_number}
                 placeholder="10-digit mobile number"
                 required
+              />
+              <Input
+                label="Secondary Mobile Number (Optional)"
+                value={formData.secondary_mobile_number}
+                onChange={(e) => handleChange('secondary_mobile_number', e.target.value)}
+                error={errors.secondary_mobile_number}
+                placeholder="10-digit mobile number"
               />
               <Input
                 label="Email Address"

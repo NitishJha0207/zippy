@@ -48,6 +48,7 @@ export interface Profile {
   id: string;
   user_name: string;
   mobile_number: string;
+  secondary_mobile_number: string | null;
   email: string;
   company_name: string;
   company_address: string;
