@@ -11,7 +11,6 @@ import toast from 'react-hot-toast';
 
 interface InvoiceItem {
   product_description: string;
-  students_staff: string;
   hsn_code: string;
   quantity: number;
   rate: number;
@@ -67,7 +66,7 @@ export function InvoiceForm({ isOpen, onClose, onSave }: InvoiceFormProps) {
   });
 
   const [items, setItems] = useState<InvoiceItem[]>([
-    { product_description: '', students_staff: '', hsn_code: '', quantity: 1, rate: 0, gst_rate: 18 }
+    { product_description: '', hsn_code: '', quantity: 1, rate: 0, gst_rate: 18 }
   ]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -142,12 +141,12 @@ export function InvoiceForm({ isOpen, onClose, onSave }: InvoiceFormProps) {
       ship_to_state_code: '',
       terms_conditions: profile?.default_terms || ''
     });
-    setItems([{ product_description: '', students_staff: '', hsn_code: '', quantity: 1, rate: 0, gst_rate: 18 }]);
+    setItems([{ product_description: '', hsn_code: '', quantity: 1, rate: 0, gst_rate: 18 }]);
     setErrors({});
   };
 
   const addItem = () => {
-    setItems([...items, { product_description: '', students_staff: '', hsn_code: '', quantity: 1, rate: 0, gst_rate: 18 }]);
+    setItems([...items, { product_description: '', hsn_code: '', quantity: 1, rate: 0, gst_rate: 18 }]);
   };
 
   const removeItem = (index: number) => {
@@ -329,7 +328,6 @@ export function InvoiceForm({ isOpen, onClose, onSave }: InvoiceFormProps) {
                 <tr>
                   <th className="px-2 py-2 text-left text-xs font-medium text-gray-700">S.No</th>
                   <th className="px-2 py-2 text-left text-xs font-medium text-gray-700">Product/Service</th>
-                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-700">Students/Staff</th>
                   <th className="px-2 py-2 text-left text-xs font-medium text-gray-700">HSN</th>
                   <th className="px-2 py-2 text-right text-xs font-medium text-gray-700">Qty</th>
                   <th className="px-2 py-2 text-right text-xs font-medium text-gray-700">Rate</th>
@@ -350,13 +348,6 @@ export function InvoiceForm({ isOpen, onClose, onSave }: InvoiceFormProps) {
                         placeholder="Product/Service"
                         value={item.product_description}
                         onChange={(e) => updateItem(index, 'product_description', e.target.value)}
-                      />
-                    </td>
-                    <td className="px-2 py-2">
-                      <Input
-                        placeholder="Optional"
-                        value={item.students_staff}
-                        onChange={(e) => updateItem(index, 'students_staff', e.target.value)}
                       />
                     </td>
                     <td className="px-2 py-2">

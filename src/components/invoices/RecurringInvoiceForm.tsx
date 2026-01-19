@@ -10,7 +10,6 @@ import toast from 'react-hot-toast';
 
 interface RecurringInvoiceItem {
   product_description: string;
-  students_staff: string;
   hsn_code: string;
   quantity: number;
   rate: number;
@@ -42,7 +41,7 @@ export function RecurringInvoiceForm({ isOpen, onClose, onSave }: RecurringInvoi
   });
 
   const [items, setItems] = useState<RecurringInvoiceItem[]>([
-    { product_description: '', students_staff: '', hsn_code: '', quantity: 1, rate: 0, gst_rate: 18 }
+    { product_description: '', hsn_code: '', quantity: 1, rate: 0, gst_rate: 18 }
   ]);
 
   const calculateNextGenerationDate = (startDate: string, frequency: string) => {
@@ -136,7 +135,7 @@ export function RecurringInvoiceForm({ isOpen, onClose, onSave }: RecurringInvoi
   };
 
   const addItem = () => {
-    setItems([...items, { product_description: '', students_staff: '', hsn_code: '', quantity: 1, rate: 0, gst_rate: 18 }]);
+    setItems([...items, { product_description: '', hsn_code: '', quantity: 1, rate: 0, gst_rate: 18 }]);
   };
 
   const removeItem = (index: number) => {

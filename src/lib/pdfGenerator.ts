@@ -30,7 +30,6 @@ interface InvoiceData {
   };
   items: Array<{
     product_description: string;
-    students_staff: string | null;
     hsn_code: string | null;
     rate: number;
     quantity: number;
@@ -293,7 +292,6 @@ export function printInvoice(data: InvoiceData): void {
             <tr>
               <th style="width: 30px;">S.No</th>
               <th>Product Description</th>
-              <th style="width: 80px;">Students/Staff</th>
               <th style="width: 40px;" class="text-right">Qty</th>
               <th style="width: 60px;" class="text-right">Rate</th>
               <th style="width: 60px;" class="text-right">Amount</th>
@@ -309,7 +307,6 @@ export function printInvoice(data: InvoiceData): void {
               <tr>
                 <td class="text-center">${index + 1}</td>
                 <td>${item.product_description}</td>
-                <td>${item.students_staff || '-'}</td>
                 <td class="text-right">${item.quantity}</td>
                 <td class="text-right">${item.rate.toFixed(2)}</td>
                 <td class="text-right">${item.amount.toFixed(2)}</td>
@@ -321,7 +318,7 @@ export function printInvoice(data: InvoiceData): void {
               </tr>
             `).join('')}
             <tr style="font-weight: bold;">
-              <td colspan="5" class="text-right">Total</td>
+              <td colspan="4" class="text-right">Total</td>
               <td class="text-right">${invoice.subtotal.toFixed(2)}</td>
               <td></td>
               <td class="text-right">${invoice.subtotal.toFixed(2)}</td>

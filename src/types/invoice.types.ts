@@ -9,7 +9,6 @@ export interface PartyDetails {
 export interface InvoiceItemForm {
   id: string;
   product_description: string;
-  students_staff: string;
   hsn_code: string;
   rate: number;
   quantity: number;
