@@ -306,6 +306,7 @@ export function InvoicePreview({ invoiceId, isOpen, onClose }: InvoicePreviewPro
                 <h1 className="text-lg font-bold uppercase">{profile.company_name}</h1>
                 <p className="text-xs mt-0.5">{profile.company_address}{profile.pincode ? `, ${profile.pincode}` : ''}</p>
                 <p className="text-xs">GSTN: {profile.gstin || 'N/A'}</p>
+                <p className="text-xs">Mobile: {profile.mobile_number} | Email: {profile.email}</p>
               </div>
               {profile.company_logo_url && <div className="w-20"></div>}
             </div>

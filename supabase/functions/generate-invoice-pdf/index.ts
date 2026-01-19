@@ -54,6 +54,8 @@ interface InvoiceData {
     gstin: string | null;
     company_logo_url: string | null;
     upi_id: string | null;
+    mobile_number: string;
+    email: string;
   };
 }
 
@@ -168,6 +170,9 @@ async function generateInvoicePDF(data: InvoiceData): Promise<jsPDF> {
 
   y += 5;
   pdf.text(`GSTN: ${profile.gstin || 'N/A'}`, pageWidth / 2, y, { align: 'center' });
+
+  y += 5;
+  pdf.text(`Mobile: ${profile.mobile_number} | Email: ${profile.email}`, pageWidth / 2, y, { align: 'center' });
 
   if (profile.company_logo_url) {
     y += 7;

@@ -45,6 +45,8 @@ interface InvoiceData {
     pincode: string | null;
     gstin: string | null;
     company_logo_url?: string | null;
+    mobile_number: string;
+    email: string;
   };
 }
 
@@ -251,6 +253,7 @@ export function printInvoice(data: InvoiceData): void {
             <div class="company-name">${profile.company_name.toUpperCase()}</div>
             <div>${profile.company_address}${profile.pincode ? `, ${profile.pincode}` : ''}</div>
             <div>GSTN: ${profile.gstin || 'N/A'}</div>
+            <div>Mobile: ${profile.mobile_number} | Email: ${profile.email}</div>
           </div>
           ${profile.company_logo_url ? '<div style="width: 60px;"></div>' : ''}
         </div>
