@@ -157,6 +157,7 @@ export interface InvoiceItem {
   product_description: string;
   students_staff: string | null;
   hsn_code: string;
+  barcode: string | null;
   rate: number;
   quantity: number;
   amount: number;
