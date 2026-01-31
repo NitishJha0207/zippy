@@ -185,6 +185,8 @@ export function printInvoice(data: InvoiceData): void {
         .col {
           padding: 10px;
           border-right: 1px solid #000;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
         }
         .col:last-child {
           border-right: none;
@@ -226,6 +228,20 @@ export function printInvoice(data: InvoiceData): void {
         }
         .bank-section {
           min-height: 100px;
+        }
+        .bank-details {
+          margin-bottom: 12px;
+        }
+        .terms-conditions {
+          margin-top: 12px;
+          padding-top: 8px;
+          border-top: 1px solid #ccc;
+        }
+        .terms-text {
+          font-size: 8pt;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+          max-width: 100%;
         }
         .signature {
           text-align: right;
@@ -351,15 +367,19 @@ export function printInvoice(data: InvoiceData): void {
 
         <div class="section two-col bank-section">
           <div class="col">
-            <div style="font-weight: bold; margin-bottom: 6px;">Bank Details</div>
-            ${invoice.bank_name ? `
-              <div class="row">Bank Name: ${invoice.bank_name}</div>
-              ${invoice.account_number ? `<div class="row">Bank A/C: ${invoice.account_number}</div>` : ''}
-              ${invoice.ifsc_code ? `<div class="row">Bank IFSC: ${invoice.ifsc_code}</div>` : ''}
+            ${invoice.bank_name || invoice.account_number || invoice.ifsc_code ? `
+              <div class="bank-details">
+                <div style="font-weight: bold; margin-bottom: 6px;">Bank Details</div>
+                ${invoice.bank_name ? `<div class="row">Bank Name: ${invoice.bank_name}</div>` : ''}
+                ${invoice.account_number ? `<div class="row">Bank A/C: ${invoice.account_number}</div>` : ''}
+                ${invoice.ifsc_code ? `<div class="row">Bank IFSC: ${invoice.ifsc_code}</div>` : ''}
+              </div>
             ` : ''}
             ${invoice.terms_conditions ? `
-              <div style="font-weight: bold; margin-top: 10px; margin-bottom: 4px;">Terms & Conditions</div>
-              <div style="font-size: 8pt;">${invoice.terms_conditions}</div>
+              <div class="terms-conditions">
+                <div style="font-weight: bold; margin-bottom: 4px;">Terms & Conditions</div>
+                <div class="terms-text">${invoice.terms_conditions}</div>
+              </div>
             ` : ''}
           </div>
           <div class="col signature">

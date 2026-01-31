@@ -150,7 +150,7 @@ export async function getInvoiceHTMLWithQR(invoice: any, items: any[], profile: 
         .title { font-size: 14pt; font-weight: bold; text-align: center; background: #e8e8e8; padding: 8px; margin: 8px 0; border: 1px solid #000; }
         .info-section { border: 1px solid #000; margin: 8px 0; overflow: hidden; }
         .info-row { display: table; width: 100%; }
-        .info-col { display: table-cell; width: 50%; padding: 8px; border-right: 1px solid #000; vertical-align: top; }
+        .info-col { display: table-cell; width: 50%; padding: 8px; border-right: 1px solid #000; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
         .info-col:last-child { border-right: none; }
         .row { margin-bottom: 4px; font-size: 10pt; }
         .label { font-weight: bold; }
@@ -161,6 +161,8 @@ export async function getInvoiceHTMLWithQR(invoice: any, items: any[], profile: 
         .text-center { text-align: center; }
         .total-row { font-weight: bold; background: #f5f5f5; }
         .summary-section { border: 1px solid #000; margin: 8px 0; overflow: hidden; }
+        .terms-section { border: 1px solid #000; margin: 8px 0; padding: 8px; border-top: none; }
+        .terms-text { font-size: 9pt; white-space: pre-wrap; word-wrap: break-word; line-height: 1.4; }
         .signature { text-align: right; margin-top: 20px; padding-top: 15px; border-top: 1px solid #ccc; }
         .qr-code { max-width: 120px; max-height: 120px; display: block; margin: 5px 0; }
       </style>
@@ -248,6 +250,13 @@ export async function getInvoiceHTMLWithQR(invoice: any, items: any[], profile: 
           </div>
         </div>
 
+        ${invoice.terms_conditions ? `
+          <div class="terms-section">
+            <div style="font-weight: bold; margin-bottom: 6px; font-size: 10pt;">Terms & Conditions:</div>
+            <div class="terms-text">${invoice.terms_conditions}</div>
+          </div>
+        ` : ''}
+
         <div class="signature">
           <div style="font-weight: bold; font-size: 11pt;">For ${profile.company_name}</div>
           <div style="margin-top: 30px; font-size: 9pt; color: #666;">Authorised Signatory</div>
@@ -278,7 +287,7 @@ export function getInvoiceHTML(invoice: any, items: any[], profile: any): string
         .title { font-size: 14pt; font-weight: bold; text-align: center; background: #e8e8e8; padding: 8px; margin: 8px 0; border: 1px solid #000; }
         .info-section { border: 1px solid #000; margin: 8px 0; overflow: hidden; }
         .info-row { display: table; width: 100%; }
-        .info-col { display: table-cell; width: 50%; padding: 8px; border-right: 1px solid #000; vertical-align: top; }
+        .info-col { display: table-cell; width: 50%; padding: 8px; border-right: 1px solid #000; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
         .info-col:last-child { border-right: none; }
         .row { margin-bottom: 4px; font-size: 10pt; }
         .label { font-weight: bold; }
@@ -289,6 +298,8 @@ export function getInvoiceHTML(invoice: any, items: any[], profile: any): string
         .text-center { text-align: center; }
         .total-row { font-weight: bold; background: #f5f5f5; }
         .summary-section { border: 1px solid #000; margin: 8px 0; overflow: hidden; }
+        .terms-section { border: 1px solid #000; margin: 8px 0; padding: 8px; border-top: none; }
+        .terms-text { font-size: 9pt; white-space: pre-wrap; word-wrap: break-word; line-height: 1.4; }
         .signature { text-align: right; margin-top: 20px; padding-top: 15px; border-top: 1px solid #ccc; }
       </style>
     </head>
@@ -365,6 +376,13 @@ export function getInvoiceHTML(invoice: any, items: any[], profile: any): string
             </div>
           </div>
         </div>
+
+        ${invoice.terms_conditions ? `
+          <div class="terms-section">
+            <div style="font-weight: bold; margin-bottom: 6px; font-size: 10pt;">Terms & Conditions:</div>
+            <div class="terms-text">${invoice.terms_conditions}</div>
+          </div>
+        ` : ''}
 
         <div class="signature">
           <div style="font-weight: bold; font-size: 11pt;">For ${profile.company_name}</div>
