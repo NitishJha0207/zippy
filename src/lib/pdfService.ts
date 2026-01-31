@@ -148,11 +148,11 @@ export async function getInvoiceHTMLWithQR(invoice: any, items: any[], profile: 
         .company-logo { max-width: 70px; max-height: 70px; margin-bottom: 8px; display: block; margin-left: auto; margin-right: auto; }
         .company-name { font-size: 18pt; font-weight: bold; margin-bottom: 4px; }
         .title { font-size: 14pt; font-weight: bold; text-align: center; background: #e8e8e8; padding: 8px; margin: 8px 0; border: 1px solid #000; }
-        .info-section { border: 1px solid #000; margin: 8px 0; overflow: hidden; }
-        .info-row { display: table; width: 100%; }
-        .info-col { display: table-cell; width: 50%; padding: 8px; border-right: 1px solid #000; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
+        .info-section { border: 1px solid #000; margin: 8px 0; overflow: hidden; box-sizing: border-box; }
+        .info-row { display: table; width: 100%; table-layout: fixed; }
+        .info-col { display: table-cell; width: 50%; max-width: 50%; padding: 8px; border-right: 1px solid #000; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; overflow: hidden; }
         .info-col:last-child { border-right: none; }
-        .row { margin-bottom: 4px; font-size: 10pt; }
+        .row { margin-bottom: 4px; font-size: 10pt; word-wrap: break-word; overflow-wrap: break-word; }
         .label { font-weight: bold; }
         table { width: 100%; border-collapse: collapse; margin: 8px 0; }
         th, td { border: 1px solid #000; padding: 6px 4px; font-size: 10pt; }
@@ -160,9 +160,9 @@ export async function getInvoiceHTMLWithQR(invoice: any, items: any[], profile: 
         .text-right { text-align: right; }
         .text-center { text-align: center; }
         .total-row { font-weight: bold; background: #f5f5f5; }
-        .summary-section { border: 1px solid #000; margin: 8px 0; overflow: hidden; }
-        .terms-section { border: 1px solid #000; margin: 8px 0; padding: 8px; border-top: none; }
-        .terms-text { font-size: 9pt; white-space: pre-wrap; word-wrap: break-word; line-height: 1.4; }
+        .summary-section { border: 1px solid #000; margin: 8px 0; overflow: hidden; box-sizing: border-box; }
+        .terms-section { border: 1px solid #000; margin: 8px 0; padding: 8px; border-top: none; overflow: hidden; box-sizing: border-box; }
+        .terms-text { font-size: 9pt; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; line-height: 1.4; max-width: 100%; }
         .signature { text-align: right; margin-top: 20px; padding-top: 15px; border-top: 1px solid #ccc; }
         .qr-code { max-width: 120px; max-height: 120px; display: block; margin: 5px 0; }
       </style>
@@ -224,7 +224,7 @@ export async function getInvoiceHTMLWithQR(invoice: any, items: any[], profile: 
             <div class="info-col">
               ${profile.upi_id ? `
                 <div class="row"><span class="label">Payment via UPI:</span></div>
-                <div class="row">${profile.upi_id}</div>
+                <div class="row" style="word-break: break-all;">${profile.upi_id}</div>
                 ${qrCodeDataUrl ? `
                   <div style="margin-top: 8px;">
                     <div style="font-size: 9pt; font-weight: bold; margin-bottom: 4px;">Scan to Pay:</div>
@@ -234,9 +234,9 @@ export async function getInvoiceHTMLWithQR(invoice: any, items: any[], profile: 
               ` : ''}
               ${invoice.bank_name ? `
                 <div class="row" style="margin-top: ${profile.upi_id ? '10px' : '0'}"><span class="label">Bank Details:</span></div>
-                <div class="row">Bank: ${invoice.bank_name}</div>
-                ${invoice.account_number ? `<div class="row">A/C: ${invoice.account_number}</div>` : ''}
-                ${invoice.ifsc_code ? `<div class="row">IFSC: ${invoice.ifsc_code}</div>` : ''}
+                <div class="row" style="word-break: break-all;">Bank: ${invoice.bank_name}</div>
+                ${invoice.account_number ? `<div class="row" style="word-break: break-all;">A/C: ${invoice.account_number}</div>` : ''}
+                ${invoice.ifsc_code ? `<div class="row" style="word-break: break-all;">IFSC: ${invoice.ifsc_code}</div>` : ''}
               ` : ''}
             </div>
             <div class="info-col">
@@ -285,11 +285,11 @@ export function getInvoiceHTML(invoice: any, items: any[], profile: any): string
         .company-logo { max-width: 70px; max-height: 70px; margin-bottom: 8px; display: block; margin-left: auto; margin-right: auto; }
         .company-name { font-size: 18pt; font-weight: bold; margin-bottom: 4px; }
         .title { font-size: 14pt; font-weight: bold; text-align: center; background: #e8e8e8; padding: 8px; margin: 8px 0; border: 1px solid #000; }
-        .info-section { border: 1px solid #000; margin: 8px 0; overflow: hidden; }
-        .info-row { display: table; width: 100%; }
-        .info-col { display: table-cell; width: 50%; padding: 8px; border-right: 1px solid #000; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
+        .info-section { border: 1px solid #000; margin: 8px 0; overflow: hidden; box-sizing: border-box; }
+        .info-row { display: table; width: 100%; table-layout: fixed; }
+        .info-col { display: table-cell; width: 50%; max-width: 50%; padding: 8px; border-right: 1px solid #000; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; overflow: hidden; }
         .info-col:last-child { border-right: none; }
-        .row { margin-bottom: 4px; font-size: 10pt; }
+        .row { margin-bottom: 4px; font-size: 10pt; word-wrap: break-word; overflow-wrap: break-word; }
         .label { font-weight: bold; }
         table { width: 100%; border-collapse: collapse; margin: 8px 0; }
         th, td { border: 1px solid #000; padding: 6px 4px; font-size: 10pt; }
@@ -297,9 +297,9 @@ export function getInvoiceHTML(invoice: any, items: any[], profile: any): string
         .text-right { text-align: right; }
         .text-center { text-align: center; }
         .total-row { font-weight: bold; background: #f5f5f5; }
-        .summary-section { border: 1px solid #000; margin: 8px 0; overflow: hidden; }
-        .terms-section { border: 1px solid #000; margin: 8px 0; padding: 8px; border-top: none; }
-        .terms-text { font-size: 9pt; white-space: pre-wrap; word-wrap: break-word; line-height: 1.4; }
+        .summary-section { border: 1px solid #000; margin: 8px 0; overflow: hidden; box-sizing: border-box; }
+        .terms-section { border: 1px solid #000; margin: 8px 0; padding: 8px; border-top: none; overflow: hidden; box-sizing: border-box; }
+        .terms-text { font-size: 9pt; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; line-height: 1.4; max-width: 100%; }
         .signature { text-align: right; margin-top: 20px; padding-top: 15px; border-top: 1px solid #ccc; }
       </style>
     </head>
@@ -360,11 +360,11 @@ export function getInvoiceHTML(invoice: any, items: any[], profile: any): string
             <div class="info-col">
               ${invoice.bank_name ? `
                 <div class="row"><span class="label">Payment Details:</span></div>
-                <div class="row">Bank: ${invoice.bank_name}</div>
-                ${invoice.account_number ? `<div class="row">A/C: ${invoice.account_number}</div>` : ''}
-                ${invoice.ifsc_code ? `<div class="row">IFSC: ${invoice.ifsc_code}</div>` : ''}
-                ${profile.upi_id ? `<div class="row">UPI: ${profile.upi_id}</div>` : ''}
-              ` : (profile.upi_id ? `<div class="row"><span class="label">UPI:</span> ${profile.upi_id}</div>` : '')}
+                <div class="row" style="word-break: break-all;">Bank: ${invoice.bank_name}</div>
+                ${invoice.account_number ? `<div class="row" style="word-break: break-all;">A/C: ${invoice.account_number}</div>` : ''}
+                ${invoice.ifsc_code ? `<div class="row" style="word-break: break-all;">IFSC: ${invoice.ifsc_code}</div>` : ''}
+                ${profile.upi_id ? `<div class="row" style="word-break: break-all;">UPI: ${profile.upi_id}</div>` : ''}
+              ` : (profile.upi_id ? `<div class="row" style="word-break: break-all;"><span class="label">UPI:</span> ${profile.upi_id}</div>` : '')}
             </div>
             <div class="info-col">
               <div class="row">Subtotal: <span style="float: right;">Rs.${invoice.subtotal.toFixed(2)}</span></div>
