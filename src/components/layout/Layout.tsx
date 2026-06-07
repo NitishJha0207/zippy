@@ -1,4 +1,4 @@
-import { Header } from './Header';
+import { Sidebar } from './Sidebar';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -6,10 +6,12 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {children}
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#f8fafc' }}>
+      <Sidebar />
+      <main style={{ flex: 1, overflowY: 'auto', minWidth: 0 }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 24px' }}>
+          {children}
+        </div>
       </main>
     </div>
   );
