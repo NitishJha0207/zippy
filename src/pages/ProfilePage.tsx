@@ -9,6 +9,7 @@ import { ReminderSettings } from '../components/settings/ReminderSettings';
 import { RazorpaySettings } from '../components/settings/RazorpaySettings';
 import { EInvoiceInfo } from '../components/settings/EInvoiceInfo';
 import { SubscriptionPanel } from '../components/subscription/SubscriptionPanel';
+import { SubscriptionGuard } from '../components/subscription/SubscriptionGuard';
 import { validateGSTIN, validateMobile } from '../lib/utils';
 import { User, ArrowLeft, Bell, CreditCard, Crown, FileCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -306,11 +307,19 @@ export function ProfilePage() {
         </form>
         )}
 
-        {activeTab === 'reminders' && <ReminderSettings />}
+        {activeTab === 'reminders' && (
+          <SubscriptionGuard feature="reminders">
+            <ReminderSettings />
+          </SubscriptionGuard>
+        )}
 
         {activeTab === 'payment' && <RazorpaySettings />}
 
-        {activeTab === 'einvoice' && <EInvoiceInfo />}
+        {activeTab === 'einvoice' && (
+          <SubscriptionGuard feature="eInvoice" requiredTier="business">
+            <EInvoiceInfo />
+          </SubscriptionGuard>
+        )}
 
         {activeTab === 'subscription' && <SubscriptionPanel />}
       </div>

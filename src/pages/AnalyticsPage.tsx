@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInvoices } from '../hooks/useInvoices';
 import { useCustomers } from '../hooks/useCustomers';
+import { SubscriptionGuard } from '../components/subscription/SubscriptionGuard';
+import { Layout } from '../components/layout/Layout';
 import { ArrowLeft, TrendingUp, DollarSign, Users, FileText, Calendar, Download } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, startOfYear, endOfYear, subMonths, parseISO } from 'date-fns';
 
@@ -68,13 +70,14 @@ export function AnalyticsPage() {
   const maxRevenue = Math.max(...monthlyData.map(d => d.revenue), 1);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
-          >
+    <Layout>
+      <SubscriptionGuard feature="analytics" overlay>
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-8">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
+            >
             <ArrowLeft className="w-5 h-5" />
             <span>Back</span>
           </button>
@@ -279,6 +282,7 @@ export function AnalyticsPage() {
           </div>
         </div>
       </div>
-    </div>
+      </SubscriptionGuard>
+    </Layout>
   );
 }

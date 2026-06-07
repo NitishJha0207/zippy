@@ -22,6 +22,13 @@ export function useProfile() {
     if (!user) return;
 
     try {
+      // Run expiry check and monthly-count reset before fetching,
+      // so the profile we read back is always up-to-date.
+      await Promise.all([
+        supabase.rpc('check_and_expire_subscription', { p_user_id: user.id }),
+        supabase.rpc('maybe_reset_monthly_invoice_count', { p_user_id: user.id }),
+      ]);
+
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -38,7 +45,9 @@ export function useProfile() {
     }
   };
 
-  const createProfile = async (profileData: Omit<Profile, 'id' | 'created_at' | 'updated_at'>) => {
+  const createProfile = async (
+    profileData: Omit<Profile, 'id' | 'created_at' | 'updated_at'>
+  ) => {
     if (!user) return { error: 'No user' };
 
     try {
@@ -64,7 +73,9 @@ export function useProfile() {
     }
   };
 
-  const updateProfile = async (updates: Partial<Omit<Profile, 'id' | 'created_at' | 'updated_at'>>) => {
+  const updateProfile = async (
+    updates: Partial<Omit<Profile, 'id' | 'created_at' | 'updated_at'>>
+  ) => {
     if (!user) return { error: 'No user' };
 
     try {
@@ -87,11 +98,35 @@ export function useProfile() {
     }
   };
 
+  /** Activate (or renew) a paid plan — sets exact 30-day window via DB function. */
+  const activateSubscription = async (tier: 'pro' | 'business') => {
+    if (!user) return { error: 'No user' };
+
+    try {
+      const { error } = await supabase.rpc('activate_subscription', {
+        p_user_id: user.id,
+        p_tier: tier,
+      });
+
+      if (error) throw error;
+
+      // Re-fetch so the profile state reflects the new dates immediately
+      await fetchProfile();
+      toast.success(`${tier.charAt(0).toUpperCase() + tier.slice(1)} plan activated!`);
+      return { error: null };
+    } catch (error: any) {
+      console.error('Error activating subscription:', error);
+      toast.error('Failed to activate subscription');
+      return { error: error.message };
+    }
+  };
+
   return {
     profile,
     loading,
     createProfile,
     updateProfile,
-    refetch: fetchProfile
+    activateSubscription,
+    refetch: fetchProfile,
   };
 }
