@@ -6,12 +6,11 @@ import { Input } from '../components/ui/Input';
 import { LogoUpload } from '../components/onboarding/LogoUpload';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { ReminderSettings } from '../components/settings/ReminderSettings';
-import { RazorpaySettings } from '../components/settings/RazorpaySettings';
 import { EInvoiceInfo } from '../components/settings/EInvoiceInfo';
 import { SubscriptionPanel } from '../components/subscription/SubscriptionPanel';
 import { SubscriptionGuard } from '../components/subscription/SubscriptionGuard';
 import { validateGSTIN, validateMobile } from '../lib/utils';
-import { User, ArrowLeft, Bell, CreditCard, Crown, FileCheck } from 'lucide-react';
+import { User, ArrowLeft, Bell, Crown, FileCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export function ProfilePage() {
@@ -19,7 +18,7 @@ export function ProfilePage() {
   const [searchParams] = useSearchParams();
   const { profile, loading: profileLoading, updateProfile } = useProfile();
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'profile' | 'reminders' | 'payment' | 'subscription' | 'einvoice'>(
+  const [activeTab, setActiveTab] = useState<'profile' | 'reminders' | 'subscription' | 'einvoice'>(
     (searchParams.get('tab') as any) ?? 'profile'
   );
   const [formData, setFormData] = useState({
@@ -128,7 +127,6 @@ export function ProfilePage() {
   const tabs = [
     { id: 'profile' as const, label: 'Profile', icon: User },
     { id: 'reminders' as const, label: 'Reminders', icon: Bell },
-    { id: 'payment' as const, label: 'Payment Gateway', icon: CreditCard },
     { id: 'subscription' as const, label: 'Subscription', icon: Crown },
     { id: 'einvoice' as const, label: 'e-Invoice Compliance', icon: FileCheck }
   ];
@@ -313,9 +311,7 @@ export function ProfilePage() {
           </SubscriptionGuard>
         )}
 
-        {activeTab === 'payment' && <RazorpaySettings />}
-
-        {activeTab === 'einvoice' && (
+{activeTab === 'einvoice' && (
           <SubscriptionGuard feature="eInvoice" requiredTier="business">
             <EInvoiceInfo />
           </SubscriptionGuard>
