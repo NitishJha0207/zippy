@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { CheckCircle, XCircle, Zap, Star, Building2, AlertTriangle, Clock, Mail, MessageCircle, Phone } from 'lucide-react';
 import { useSubscription } from '../../hooks/useSubscription';
 import { useProfile } from '../../hooks/useProfile';
+import { useCurrency } from '../../hooks/useCurrency';
 import { format, formatDistanceToNow } from 'date-fns';
 
 const CONTACT_EMAIL = 'nitishjha@pathwise.in';
@@ -12,7 +13,7 @@ const PLANS = [
   {
     id: 'free' as const,
     name: 'Free',
-    price: '₹0',
+    priceINR: 0,
     period: 'forever',
     icon: Zap,
     color: '#64748b',
@@ -31,7 +32,7 @@ const PLANS = [
   {
     id: 'pro' as const,
     name: 'Pro',
-    price: '₹999',
+    priceINR: 249,
     period: '/month',
     icon: Star,
     color: '#2563eb',
@@ -51,7 +52,7 @@ const PLANS = [
   {
     id: 'business' as const,
     name: 'Business',
-    price: '₹2,499',
+    priceINR: 679,
     period: '/month',
     icon: Building2,
     color: '#f59e0b',
@@ -85,13 +86,16 @@ function buildWhatsAppLink(planName: string, planPrice: string, userEmail: strin
 }
 
 interface ContactModalProps {
-  plan: typeof PLANS[1] | typeof PLANS[2];
+  planName: string;
+  planPrice: string;
+  planGradient: string;
+  planIcon: any;
   onClose: () => void;
   userEmail: string;
   companyName: string;
 }
 
-function ContactModal({ plan, onClose, userEmail, companyName }: ContactModalProps) {
+function ContactModal({ planName, planPrice, planGradient, planIcon: PlanIcon, onClose, userEmail, companyName }: ContactModalProps) {
   return (
     <div
       onClick={onClose}
@@ -101,20 +105,18 @@ function ContactModal({ plan, onClose, userEmail, companyName }: ContactModalPro
         onClick={e => e.stopPropagation()}
         style={{ width: '100%', maxWidth: '440px', borderRadius: '20px', background: '#fff', boxShadow: '0 20px 60px rgba(0,0,0,0.2)', overflow: 'hidden' }}
       >
-        {/* Header */}
-        <div style={{ padding: '24px 24px 0', background: plan.gradient }}>
+        <div style={{ padding: '24px 24px 0', background: planGradient }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
             <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <plan.icon style={{ width: '22px', height: '22px', color: '#fff' }} />
+              <PlanIcon style={{ width: '22px', height: '22px', color: '#fff' }} />
             </div>
             <div>
               <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '12px' }}>Subscribe to</p>
-              <h2 style={{ color: '#fff', fontWeight: 800, fontSize: '20px' }}>{plan.name} Plan — {plan.price}/mo</h2>
+              <h2 style={{ color: '#fff', fontWeight: 800, fontSize: '20px' }}>{planName} Plan — {planPrice}/mo</h2>
             </div>
           </div>
         </div>
 
-        {/* Body */}
         <div style={{ padding: '24px' }}>
           <div style={{ padding: '14px', borderRadius: '12px', background: '#fefce8', border: '1px solid #fde68a', marginBottom: '20px' }}>
             <p style={{ fontSize: '13px', color: '#92400e', lineHeight: 1.6 }}>
@@ -126,7 +128,7 @@ function ContactModal({ plan, onClose, userEmail, companyName }: ContactModalPro
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <a
-              href={buildEmailLink(plan.name, plan.price, userEmail, companyName)}
+              href={buildEmailLink(planName, planPrice, userEmail, companyName)}
               target="_blank"
               rel="noreferrer"
               style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', borderRadius: '12px', background: '#eff6ff', border: '1px solid #bfdbfe', textDecoration: 'none', cursor: 'pointer' }}
@@ -141,7 +143,7 @@ function ContactModal({ plan, onClose, userEmail, companyName }: ContactModalPro
             </a>
 
             <a
-              href={buildWhatsAppLink(plan.name, plan.price, userEmail, companyName)}
+              href={buildWhatsAppLink(planName, planPrice, userEmail, companyName)}
               target="_blank"
               rel="noreferrer"
               style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', borderRadius: '12px', background: '#f0fdf4', border: '1px solid #bbf7d0', textDecoration: 'none', cursor: 'pointer' }}
@@ -191,12 +193,18 @@ export function SubscriptionPanel() {
     monthlyCount,
     invoiceLimit,
   } = useSubscription();
+  const { subscriptionPrice, currency } = useCurrency();
 
   const [contactPlan, setContactPlan] = useState<typeof PLANS[1] | typeof PLANS[2] | null>(null);
 
   const currentPlan = PLANS.find(p => p.id === effectiveTier) ?? PLANS[0];
   const userEmail = profile?.email ?? '';
   const companyName = profile?.company_name ?? '';
+
+  const getPlanPrice = (plan: typeof PLANS[number]): string => {
+    if (plan.id === 'free') return `${currency.symbol}0`;
+    return subscriptionPrice(plan.id as 'pro' | 'business');
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
@@ -338,7 +346,7 @@ export function SubscriptionPanel() {
                   <div>
                     <p style={{ fontWeight: 700, color: '#0f172a', fontSize: '16px' }}>{plan.name}</p>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
-                      <span style={{ fontSize: '20px', fontWeight: 800, color: plan.color }}>{plan.price}</span>
+                      <span style={{ fontSize: '20px', fontWeight: 800, color: plan.color }}>{getPlanPrice(plan)}</span>
                       <span style={{ fontSize: '12px', color: '#94a3b8' }}>{plan.period}</span>
                     </div>
                   </div>
@@ -395,7 +403,10 @@ export function SubscriptionPanel() {
 
       {contactPlan && (
         <ContactModal
-          plan={contactPlan}
+          planName={contactPlan.name}
+          planPrice={getPlanPrice(contactPlan)}
+          planGradient={contactPlan.gradient}
+          planIcon={contactPlan.icon}
           onClose={() => setContactPlan(null)}
           userEmail={userEmail}
           companyName={companyName}

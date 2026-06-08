@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useProfile } from '../hooks/useProfile';
+import { useCurrency } from '../hooks/useCurrency';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { LogoUpload } from '../components/onboarding/LogoUpload';
@@ -10,13 +11,14 @@ import { EInvoiceInfo } from '../components/settings/EInvoiceInfo';
 import { SubscriptionPanel } from '../components/subscription/SubscriptionPanel';
 import { SubscriptionGuard } from '../components/subscription/SubscriptionGuard';
 import { validateGSTIN, validateMobile } from '../lib/utils';
-import { User, ArrowLeft, Bell, Crown, FileCheck } from 'lucide-react';
+import { User, ArrowLeft, Bell, Crown, FileCheck, Globe } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export function ProfilePage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { profile, loading: profileLoading, updateProfile } = useProfile();
+  const { currencyCode, currencies, setCurrency } = useCurrency();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'profile' | 'reminders' | 'subscription' | 'einvoice'>(
     (searchParams.get('tab') as any) ?? 'profile'
@@ -252,6 +254,27 @@ export function ProfilePage() {
                 />
               </div>
             </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-lg shadow">
+            <div className="flex items-center gap-3 mb-4">
+              <Globe className="w-5 h-5 text-blue-600" />
+              <h3 className="text-lg font-semibold">Currency</h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              Select your preferred currency. All invoices, subscription plans, and values will be displayed in this currency.
+            </p>
+            <select
+              value={currencyCode}
+              onChange={(e) => setCurrency(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            >
+              {currencies.map(c => (
+                <option key={c.code} value={c.code}>
+                  {c.symbol} {c.code} — {c.name} ({c.country})
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow">

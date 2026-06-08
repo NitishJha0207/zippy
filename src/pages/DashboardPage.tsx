@@ -10,6 +10,7 @@ import { Button } from '../components/ui/Button';
 import { CustomerModal } from '../components/customers/CustomerModal';
 import { InvoiceForm } from '../components/invoices/InvoiceForm';
 import { InvoiceList } from '../components/invoices/InvoiceList';
+import { useCurrency } from '../hooks/useCurrency';
 import { Users, FileText, Plus, DollarSign, CheckCircle, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -21,6 +22,7 @@ export function DashboardPage() {
   const { customers, loading: customersLoading, createCustomer, updateCustomer } = useCustomers();
   const { invoices, createInvoice } = useInvoices();
   const { tier, monthlyCount, invoiceLimit, canCreateInvoice } = useSubscription();
+  const { format: fmtCurrency, currency } = useCurrency();
   const [activeTab, setActiveTab] = useState<TabType>('invoices');
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
   const [isInvoiceFormOpen, setIsInvoiceFormOpen] = useState(false);
@@ -60,7 +62,7 @@ export function DashboardPage() {
   const totalRevenue = invoices.reduce((sum, inv) => sum + inv.grand_total, 0);
   const paidRevenue = invoices.filter(i => i.status === 'paid').reduce((sum, inv) => sum + inv.grand_total, 0);
   const pendingCount = invoices.filter(i => i.status === 'sent' || i.status === 'overdue').length;
-  const fmt = (n: number) => n >= 100000 ? `₹${(n / 100000).toFixed(1)}L` : n >= 1000 ? `₹${(n / 1000).toFixed(1)}K` : `₹${n.toFixed(0)}`;
+  const fmt = (n: number) => fmtCurrency(n);
 
   const statCards = [
     { label: 'Total Revenue', value: fmt(totalRevenue), icon: DollarSign, bg: 'linear-gradient(135deg,#1d4ed8,#2563eb)', shadow: '0 8px 32px rgba(37,99,235,0.3)' },

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useInvoices } from '../../hooks/useInvoices';
+import { useCurrency } from '../../hooks/useCurrency';
 import { Button } from '../ui/Button';
 import { Eye, Download, Trash2, Filter, FileDown } from 'lucide-react';
 import { format } from 'date-fns';
@@ -10,6 +11,7 @@ import { InvoiceStatus } from '../../types/database.types';
 
 export function InvoiceList() {
   const { invoices, loading, deleteInvoice, updateInvoiceStatus } = useInvoices();
+  const { format: formatAmount } = useCurrency();
   const [previewInvoice, setPreviewInvoice] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | 'all'>('all');
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -47,15 +49,15 @@ export function InvoiceList() {
       <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-blue-50 rounded-lg p-4">
           <p className="text-sm text-blue-600 mb-1">Total Invoiced</p>
-          <p className="text-2xl font-bold text-blue-900">₹{stats.total.toFixed(2)}</p>
+          <p className="text-2xl font-bold text-blue-900">{formatAmount(stats.total)}</p>
         </div>
         <div className="bg-green-50 rounded-lg p-4">
           <p className="text-sm text-green-600 mb-1">Total Paid</p>
-          <p className="text-2xl font-bold text-green-900">₹{stats.paid.toFixed(2)}</p>
+          <p className="text-2xl font-bold text-green-900">{formatAmount(stats.paid)}</p>
         </div>
         <div className="bg-orange-50 rounded-lg p-4">
           <p className="text-sm text-orange-600 mb-1">Total Outstanding</p>
-          <p className="text-2xl font-bold text-orange-900">₹{stats.outstanding.toFixed(2)}</p>
+          <p className="text-2xl font-bold text-orange-900">{formatAmount(stats.outstanding)}</p>
         </div>
       </div>
 
@@ -140,7 +142,7 @@ export function InvoiceList() {
                     <StatusBadge status={invoice.status} />
                   </td>
                   <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
-                    ₹{invoice.grand_total.toFixed(2)}
+                    {formatAmount(invoice.grand_total)}
                   </td>
                   <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-right text-xs sm:text-sm font-medium">
                     <div className="flex justify-end gap-2">

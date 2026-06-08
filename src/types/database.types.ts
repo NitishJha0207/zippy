@@ -66,6 +66,7 @@ export interface Profile {
   subscription_end_date: string | null;
   monthly_invoice_count: number;
   last_reset_date: string;
+  currency: string;
   created_at: string;
   updated_at: string;
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInvoices } from '../hooks/useInvoices';
 import { useCustomers } from '../hooks/useCustomers';
+import { useCurrency } from '../hooks/useCurrency';
 import { SubscriptionGuard } from '../components/subscription/SubscriptionGuard';
 import { Layout } from '../components/layout/Layout';
 import { ArrowLeft, TrendingUp, DollarSign, Users, FileText, Calendar, Download } from 'lucide-react';
@@ -10,6 +11,7 @@ import { format, startOfMonth, endOfMonth, startOfYear, endOfYear, subMonths, pa
 export function AnalyticsPage() {
   const navigate = useNavigate();
   const { invoices } = useInvoices();
+  const { format: fmtCurrency } = useCurrency();
   const { customers } = useCustomers();
   const [dateRange, setDateRange] = useState<'month' | 'year' | 'all'>('month');
 
@@ -132,7 +134,7 @@ export function AnalyticsPage() {
               <DollarSign className="w-8 h-8 opacity-80" />
               <span className="text-sm opacity-80">Total Revenue</span>
             </div>
-            <p className="text-3xl font-bold">₹{totalRevenue.toFixed(2)}</p>
+            <p className="text-3xl font-bold">{fmtCurrency(totalRevenue)}</p>
             <p className="text-sm opacity-80 mt-1">{filteredInvoices.length} invoices</p>
           </div>
 
@@ -141,7 +143,7 @@ export function AnalyticsPage() {
               <TrendingUp className="w-8 h-8 opacity-80" />
               <span className="text-sm opacity-80">Paid</span>
             </div>
-            <p className="text-3xl font-bold">₹{paidRevenue.toFixed(2)}</p>
+            <p className="text-3xl font-bold">{fmtCurrency(paidRevenue)}</p>
             <p className="text-sm opacity-80 mt-1">{((paidRevenue / totalRevenue) * 100 || 0).toFixed(1)}% collected</p>
           </div>
 
@@ -150,7 +152,7 @@ export function AnalyticsPage() {
               <Calendar className="w-8 h-8 opacity-80" />
               <span className="text-sm opacity-80">Pending</span>
             </div>
-            <p className="text-3xl font-bold">₹{pendingRevenue.toFixed(2)}</p>
+            <p className="text-3xl font-bold">{fmtCurrency(pendingRevenue)}</p>
             <p className="text-sm opacity-80 mt-1">Awaiting payment</p>
           </div>
 
@@ -159,7 +161,7 @@ export function AnalyticsPage() {
               <FileText className="w-8 h-8 opacity-80" />
               <span className="text-sm opacity-80">Overdue</span>
             </div>
-            <p className="text-3xl font-bold">₹{overdueRevenue.toFixed(2)}</p>
+            <p className="text-3xl font-bold">{fmtCurrency(overdueRevenue)}</p>
             <p className="text-sm opacity-80 mt-1">Needs attention</p>
           </div>
         </div>
@@ -174,7 +176,7 @@ export function AnalyticsPage() {
                     <span className="text-sm text-gray-600">{data.month}</span>
                     <div className="flex items-center gap-4">
                       <span className="text-sm text-gray-500">{data.count} invoices</span>
-                      <span className="text-sm font-medium">₹{data.revenue.toFixed(0)}</span>
+                      <span className="text-sm font-medium">{fmtCurrency(data.revenue)}</span>
                     </div>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
@@ -201,7 +203,7 @@ export function AnalyticsPage() {
                       <p className="font-medium text-gray-900">{customer.name}</p>
                       <p className="text-xs text-gray-500">{customer.invoiceCount} invoices</p>
                     </div>
-                    <p className="font-semibold text-gray-900">₹{customer.totalSpent.toFixed(0)}</p>
+                    <p className="font-semibold text-gray-900">{fmtCurrency(customer.totalSpent)}</p>
                   </div>
                 ))
               ) : (
@@ -224,7 +226,7 @@ export function AnalyticsPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Avg Value:</span>
-                <span className="font-semibold">₹{avgInvoiceValue.toFixed(2)}</span>
+                <span className="font-semibold">{fmtCurrency(avgInvoiceValue)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Draft:</span>
@@ -254,7 +256,7 @@ export function AnalyticsPage() {
               <div className="flex justify-between">
                 <span className="text-gray-600">Avg Revenue:</span>
                 <span className="font-semibold">
-                  ₹{(totalRevenue / (topCustomers.length || 1)).toFixed(2)}
+                  {fmtCurrency(totalRevenue / (topCustomers.length || 1))}
                 </span>
               </div>
             </div>
