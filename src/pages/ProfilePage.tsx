@@ -20,7 +20,7 @@ export function ProfilePage() {
   const { profile, loading: profileLoading, updateProfile } = useProfile();
   const { currencyCode, currencies, setCurrency } = useCurrency();
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'profile' | 'reminders' | 'subscription' | 'einvoice'>(
+  const [activeTab, setActiveTab] = useState<'profile' | 'currency' | 'reminders' | 'subscription' | 'einvoice'>(
     (searchParams.get('tab') as any) ?? 'profile'
   );
   const [formData, setFormData] = useState({
@@ -128,6 +128,7 @@ export function ProfilePage() {
 
   const tabs = [
     { id: 'profile' as const, label: 'Profile', icon: User },
+    { id: 'currency' as const, label: 'Currency', icon: Globe },
     { id: 'reminders' as const, label: 'Reminders', icon: Bell },
     { id: 'subscription' as const, label: 'Subscription', icon: Crown },
     { id: 'einvoice' as const, label: 'e-Invoice Compliance', icon: FileCheck }
@@ -257,27 +258,6 @@ export function ProfilePage() {
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center gap-3 mb-4">
-              <Globe className="w-5 h-5 text-blue-600" />
-              <h3 className="text-lg font-semibold">Currency</h3>
-            </div>
-            <p className="text-sm text-gray-600 mb-4">
-              Select your preferred currency. All invoices, subscription plans, and values will be displayed in this currency.
-            </p>
-            <select
-              value={currencyCode}
-              onChange={(e) => setCurrency(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-            >
-              {currencies.map(c => (
-                <option key={c.code} value={c.code}>
-                  {c.symbol} {c.code} — {c.name} ({c.country})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow">
             <h3 className="text-lg font-semibold mb-4">Payment Details (Optional)</h3>
             <div className="mb-4 p-4 bg-blue-50 rounded-lg">
               <h4 className="font-medium text-blue-900 mb-2">UPI Payment (Recommended for Small Business)</h4>
@@ -326,6 +306,41 @@ export function ProfilePage() {
             {loading ? 'Updating...' : 'Update Profile'}
           </Button>
         </form>
+        )}
+
+        {activeTab === 'currency' && (
+          <div className="bg-white p-6 rounded-lg shadow">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="bg-blue-100 p-2 rounded-lg">
+                <Globe className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold">Currency Preference</h3>
+                <p className="text-sm text-gray-500">Choose how amounts are displayed across the app</p>
+              </div>
+            </div>
+            <div className="mt-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Display Currency</label>
+                <select
+                  value={currencyCode}
+                  onChange={(e) => setCurrency(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white"
+                >
+                  {currencies.map(c => (
+                    <option key={c.code} value={c.code}>
+                      {c.symbol} {c.code} — {c.name} ({c.country})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                <p className="text-sm text-blue-800">
+                  <strong>Note:</strong> Changing your currency will update how amounts appear on your dashboard, invoice list, analytics, and subscription plans. Actual invoice documents will continue to show the original billed amounts.
+                </p>
+              </div>
+            </div>
+          </div>
         )}
 
         {activeTab === 'reminders' && (
