@@ -98,35 +98,11 @@ export function useProfile() {
     }
   };
 
-  /** Activate (or renew) a paid plan — sets exact 30-day window via DB function. */
-  const activateSubscription = async (tier: 'pro' | 'business') => {
-    if (!user) return { error: 'No user' };
-
-    try {
-      const { error } = await supabase.rpc('activate_subscription', {
-        p_user_id: user.id,
-        p_tier: tier,
-      });
-
-      if (error) throw error;
-
-      // Re-fetch so the profile state reflects the new dates immediately
-      await fetchProfile();
-      toast.success(`${tier.charAt(0).toUpperCase() + tier.slice(1)} plan activated!`);
-      return { error: null };
-    } catch (error: any) {
-      console.error('Error activating subscription:', error);
-      toast.error('Failed to activate subscription');
-      return { error: error.message };
-    }
-  };
-
   return {
     profile,
     loading,
     createProfile,
     updateProfile,
-    activateSubscription,
     refetch: fetchProfile,
   };
 }

@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout';
 import { useProfile } from '../../hooks/useProfile';
 import { useAdmin } from '../../hooks/useAdmin';
+import { supabase } from '../../lib/supabase';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
-import { ShieldCheck, Users, FileText, DollarSign, TrendingUp, Search, BarChart3 } from 'lucide-react';
+import { ShieldCheck, Users, FileText, DollarSign, TrendingUp, Search, BarChart3, CheckCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 type Tab = 'overview' | 'users';
 
@@ -18,6 +20,19 @@ export function AdminDashboard() {
   const { loading, totalUsers, proUsers, businessUsers, freeUsers, newUsersThisMonth, totalInvoices, totalRevenue, days14, topUsers, recentSignups, allUsers } = useAdmin();
   const [tab, setTab] = useState<Tab>('overview');
   const [search, setSearch] = useState('');
+  const [activating, setActivating] = useState<string | null>(null);
+
+  const handleActivatePlan = async (userId: string, tier: 'pro' | 'business', userName: string) => {
+    if (!window.confirm(`Activate ${tier} plan for ${userName}? This will set a 30-day subscription starting now.`)) return;
+    setActivating(userId + tier);
+    const { error } = await supabase.rpc('activate_subscription', { p_user_id: userId, p_tier: tier });
+    if (error) {
+      toast.error(`Failed: ${error.message}`);
+    } else {
+      toast.success(`${tier} plan activated for ${userName}`);
+    }
+    setActivating(null);
+  };
 
   if (profileLoading) return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><LoadingSpinner size="lg" /></div>;
 
@@ -176,7 +191,7 @@ export function AdminDashboard() {
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                   <thead>
                     <tr style={{ background: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
-                      {['User', 'Company', 'Plan', 'Status', 'Invoices', 'Joined'].map(h => (
+                      {['User', 'Company', 'Plan', 'Status', 'Invoices', 'Joined', 'Activate Plan'].map(h => (
                         <th key={h} style={{ textAlign: 'left', padding: '10px 16px', color: '#64748b', fontWeight: 700, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</th>
                       ))}
                     </tr>
@@ -204,6 +219,33 @@ export function AdminDashboard() {
                         </td>
                         <td style={{ padding: '10px 16px', fontWeight: 700, color: '#1e293b' }}>{u.monthly_invoice_count}</td>
                         <td style={{ padding: '10px 16px', color: '#94a3b8' }}>{new Date(u.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+                        <td style={{ padding: '10px 16px' }}>
+                          <div style={{ display: 'flex', gap: '6px' }}>
+                            {(['pro', 'business'] as const).map(tier => {
+                              const isCurrentTier = u.subscription_tier === tier && u.subscription_status === 'active';
+                              const key = u.id + tier;
+                              return (
+                                <button
+                                  key={tier}
+                                  onClick={() => handleActivatePlan(u.id, tier, u.user_name)}
+                                  disabled={!!activating || isCurrentTier}
+                                  title={isCurrentTier ? `Already on ${tier}` : `Activate ${tier} for ${u.user_name}`}
+                                  style={{
+                                    display: 'flex', alignItems: 'center', gap: '4px',
+                                    padding: '4px 10px', borderRadius: '7px', fontSize: '11px', fontWeight: 700, border: 'none', cursor: isCurrentTier || !!activating ? 'not-allowed' : 'pointer',
+                                    background: isCurrentTier ? 'rgba(16,185,129,0.12)' : tier === 'pro' ? 'rgba(37,99,235,0.1)' : 'rgba(245,158,11,0.1)',
+                                    color: isCurrentTier ? '#059669' : tier === 'pro' ? '#2563eb' : '#d97706',
+                                    opacity: activating === key ? 0.6 : 1,
+                                    textTransform: 'capitalize',
+                                  }}
+                                >
+                                  {isCurrentTier && <CheckCircle style={{ width: '10px', height: '10px' }} />}
+                                  {activating === key ? '…' : tier}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
